@@ -9,7 +9,7 @@
           <label for="multiplyers"> 時間拡張</label>
           <Dropdown
             v-model="selectedMultiplyer"
-            :options="multiplyers"
+            :options="MULTIPLYERS"
             optionLabel="name"
             optionValue="value"
             placeholder="x3〜x450"
@@ -21,7 +21,7 @@
           <label for="fast-forward">早回し</label>
           <Dropdown
             v-model="selectedFastForward"
-            :options="fastForwards"
+            :options="FAST_FORWARDS"
             optionLabel="name"
             optionValue="value"
             placeholder="x1〜x3"
@@ -36,6 +36,14 @@
           @click="onClickRunning"
           :isRunning="isRunning"
         />
+        <Button
+          label="通過"
+          class="p-button-info"
+          @click="onClickPassing"
+          :disabled="!isRunning"
+        />
+      </div>
+      <div>
         <Button
           label="タイマー止"
           class="p-button-warning"
@@ -60,31 +68,33 @@ import MeasureNecessaryTimeRunningButton from "./MeasureNecessaryTimeRunningButt
 import Timer from "@/logics/Timer";
 import dayjs, { Dayjs } from "dayjs";
 
+const MULTIPLYERS = [
+  { name: "x1(現実世界用)", value: 1 },
+  { name: "x3", value: 3 },
+  { name: "x6", value: 6 },
+  { name: "x12", value: 12 },
+  { name: "x30", value: 30 },
+  { name: "x60", value: 60 },
+  { name: "x120", value: 120 },
+  { name: "x450", value: 450 },
+];
+const FAST_FORWARDS = [
+  { name: "x0.5", value: 0.5 },
+  { name: "x1", value: 1 },
+  { name: "x1.5", value: 1.5 },
+  { name: "x2", value: 2 },
+  { name: "x2.5", value: 2.5 },
+  { name: "x3", value: 3 },
+  { name: "x5", value: 5 },
+  { name: "x10", value: 10 },
+];
+
 export default defineComponent({
   name: "MeasureNeccesaryTime",
   components: {
     MeasureNecessaryTimeRunningButton,
   },
   setup() {
-    const multiplyers = ref([
-      { name: "x3", value: 3 },
-      { name: "x6", value: 6 },
-      { name: "x12", value: 12 },
-      { name: "x30", value: 30 },
-      { name: "x60", value: 60 },
-      { name: "x120", value: 120 },
-      { name: "x450", value: 450 },
-    ]);
-    const fastForwards = ref([
-      { name: "x0.5", value: 0.5 },
-      { name: "x1", value: 1 },
-      { name: "x1.5", value: 1.5 },
-      { name: "x2", value: 2 },
-      { name: "x2.5", value: 2.5 },
-      { name: "x3", value: 3 },
-      { name: "x5", value: 5 },
-      { name: "x10", value: 10 },
-    ]);
     const selectedMultiplyer = ref(60);
     const selectedFastForward = ref(10);
 
@@ -122,6 +132,13 @@ export default defineComponent({
         ];
       }
     };
+    const onClickPassing = () => {
+      recordedRap.value = [
+        ...recordedRap.value,
+        dayjs(timer.value.now).diff(temporaryStartTime, "minute"),
+      ];
+      temporaryStartTime = timer.value.now;
+    };
     const allStop = () => {
       isRunning.value = false;
       timer.value.stop();
@@ -134,14 +151,15 @@ export default defineComponent({
     };
 
     return {
-      multiplyers,
-      fastForwards,
+      MULTIPLYERS,
+      FAST_FORWARDS,
       selectedMultiplyer,
       selectedFastForward,
       recordedRap,
       timer,
       formattedTime,
       onClickRunning,
+      onClickPassing,
       allStop,
       reset,
       MeasureNecessaryTimeRunningButton,
