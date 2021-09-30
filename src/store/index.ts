@@ -20,12 +20,24 @@ export interface Getters {
   getJunctionStationNameList: string[];
   getTerminalStation: TerminalStation;
   getTrainType: (key: number) => TrainType | undefined;
-  getChartJsData: chartJsData;
+  getDiagramData: chartJsData;
+}
+
+export interface Mutations {
+  updateStationsList: (
+    { diagramData: chartJsData }: State,
+    stations: string[]
+  ) => void;
+  updateDiagramData: (
+    { diagramData: chartJsData }: State,
+    { id, data }: { id: number; data: DiagramData[] }
+  ) => void;
 }
 
 // getters等々に補完が効かないのきつすぎる
 export interface IStore extends Store<State> {
   getters: Getters;
+  mutations: Mutations;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -76,7 +88,7 @@ export default createStore<State>({
       labels: ['上野', '北千住', '松戸', '柏'],
       datasets: [
         {
-          label: 'ときわ',
+          label: 'ときわ-1',
           id: 1,
           data: [
             { time: '14 04:30', station: '上野' },
@@ -111,7 +123,7 @@ export default createStore<State>({
     getTrainType({ trainTypes }): Getters['getTrainType'] {
       return (key: number) => trainTypes.get(key);
     },
-    getChartJsData({ diagramData: chartJsData }): Getters['getChartJsData'] {
+    getDiagramData({ diagramData: chartJsData }): Getters['getDiagramData'] {
       return chartJsData;
     },
   },
@@ -133,6 +145,6 @@ export default createStore<State>({
   modules: {},
 });
 
-export const useStore = (): IStore => {
-  return baseUseStore(key);
+export const useStore = () => {
+  return baseUseStore(key) as IStore;
 };

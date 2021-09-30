@@ -11,6 +11,8 @@ import Card from 'primevue/card';
 import Chart from 'primevue/chart';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import ScrollPanel from 'primevue/scrollpanel';
+import Panel from 'primevue/panel';
 
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -27,4 +29,6 @@ createApp(App)
   .component('Chart', Chart)
   .component('DataTable', DataTable)
   .component('Column', Column)
+  .component('ScrollPanel', ScrollPanel)
+  .component('Panel', Panel)
   .mount('#app');

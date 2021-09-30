@@ -1,30 +1,48 @@
 <template>
-  <div>
-    <Chart
-      type="line"
-      :data="data"
-      :options="graphOptions"
-      class="m-5"
-      ref="chartComponent"
-    />
-  </div>
-  <Button label="1往復ふやす" @click="addRound" />
-  <div class="flex flex-row justify-content-center flex-wrap">
-    <DataTable :value="data.datasets[0].data" class="m-2">
-      <template #header> ときわ </template>
-      <Column field="station" header="駅" />
-      <Column field="time" header="時刻">
-        <template #body="slotProps">
-          {{ formatDdHhmmToHhmm(slotProps.data.time) }}
-        </template>
-      </Column>
-    </DataTable>
-    <DataTable :value="ltdExpArray" class="m-2">
-      <template #header> 所要時間 </template>
-      <Column field="from" header="発駅" />
-      <Column field="to" header="着駅" />
-      <Column field="necessaryTime" header="所要時間(分)" />
-    </DataTable>
+  <div class="grid p-1">
+    <div class="col-9">
+      <Panel class="my-2">
+        <template #header> ダイヤグラム </template>
+        <Chart
+          type="line"
+          :data="data"
+          :options="graphOptions"
+          ref="chartComponent"
+        />
+      </Panel>
+
+      <Panel class="my-2">
+        <template #header>種別</template>
+
+        <DataTable :value="ltdExpArray" class="m-2">
+          <template #header> 所要時間 - ときわ</template>
+          <Column field="from" header="発駅" />
+          <Column field="to" header="着駅" />
+          <Column field="necessaryTime" header="所要時間(分)" />
+        </DataTable>
+      </Panel>
+    </div>
+    <div class="col">
+      <!-- <ScrollPanel style="height: 100vh"> -->
+      <Panel class="my-2">
+        <template #header> {{ data.datasets[0].label }} </template>
+        <Button label="1往復ふやす" @click="addRound" />
+
+        <DataTable
+          :value="data.datasets[0].data"
+          :scrollable="true"
+          scrollHeight="100vh"
+        >
+          <Column field="station" header="駅" />
+          <Column field="time" header="時刻">
+            <template #body="slotProps">
+              {{ formatDdHhmmToHhmm(slotProps.data.time) }}
+            </template>
+          </Column>
+        </DataTable>
+      </Panel>
+      <!-- </ScrollPanel> -->
+    </div>
   </div>
 </template>
 
@@ -108,7 +126,7 @@ export default defineComponent({
       return [...ltdExp.value.necessaryTimes.values()];
     });
 
-    const data = computed(() => store.getters.getChartJsData);
+    const data = computed(() => store.state.diagramData);
     const ltdExpData = computed(() => data.value.datasets[0].data);
 
     const addRound = () => {
