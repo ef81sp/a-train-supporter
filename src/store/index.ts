@@ -1,17 +1,26 @@
-import { NecessaryTime, Station, StationList, TerminalStation, TrainType } from '@/types';
+import {
+  NecessaryTime,
+  Station,
+  StationList,
+  TerminalStation,
+  TrainType,
+} from '@/types';
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
+import { chartJsData, DiagramData } from '@/types/diagram';
 
 export interface State {
   stationList: StationList;
-  trainTypes: Map<string, TrainType>;
+  trainTypes: Map<number, TrainType>;
+  diagramData: chartJsData;
 }
 
 export interface Getters {
   getStationNameList: string[];
   getJunctionStationNameList: string[];
   getTerminalStation: TerminalStation;
-  getTrainType: (key: string) => TrainType | undefined;
+  getTrainType: (key: number) => TrainType | undefined;
+  getChartJsData: chartJsData;
 }
 
 // getters等々に補完が効かないのきつすぎる
@@ -36,10 +45,11 @@ export default createStore<State>({
       startingStationName: '上野',
       endingStationName: '柏',
     },
-    trainTypes: new Map<string, TrainType>([
+    trainTypes: new Map<number, TrainType>([
       [
-        '特急',
+        1,
         {
+          id: 1,
           name: '特急',
           necessaryTimes: new Map<string, NecessaryTime>([
             [
@@ -62,6 +72,24 @@ export default createStore<State>({
         },
       ],
     ]),
+    diagramData: {
+      labels: ['上野', '北千住', '松戸', '柏'],
+      datasets: [
+        {
+          label: 'ときわ',
+          id: 1,
+          data: [
+            { time: '14 04:30', station: '上野' },
+            { time: '14 04:47', station: '松戸' },
+            { time: '14 04:51', station: '柏' },
+            { time: '14 05:01', station: '柏' },
+            { time: '14 05:05', station: '松戸' },
+            { time: '14 05:22', station: '上野' },
+          ],
+          borderColor: '#FF2222',
+        },
+      ],
+    },
   },
   getters: {
     getStationNameList({ stationList }): Getters['getStationNameList'] {
@@ -81,10 +109,26 @@ export default createStore<State>({
       };
     },
     getTrainType({ trainTypes }): Getters['getTrainType'] {
-      return (key: string) => trainTypes.get(key);
+      return (key: number) => trainTypes.get(key);
+    },
+    getChartJsData({ diagramData: chartJsData }): Getters['getChartJsData'] {
+      return chartJsData;
     },
   },
-  mutations: {},
+  mutations: {
+    updateStationList({ diagramData: chartJsData }: State, stations: string[]) {
+      chartJsData.labels = stations;
+    },
+    updateDiagramData(
+      { diagramData: chartJsData }: State,
+      { id, data }: { id: number; data: DiagramData[] }
+    ) {
+      const target = chartJsData.datasets.find((v) => v.id === id);
+      if (target) {
+        target.data = data;
+      }
+    },
+  },
   actions: {},
   modules: {},
 });

@@ -1,10 +1,16 @@
 <template>
   <div>
-    <Chart type="line" :data="data" :options="graphOptions" class="m-5" />
+    <Chart
+      type="line"
+      :data="data"
+      :options="graphOptions"
+      class="m-5"
+      ref="chartComponent"
+    />
   </div>
   <Button label="1往復ふやす" @click="addRound" />
   <div class="flex flex-row justify-content-center flex-wrap">
-    <DataTable :value="ltdExpData" class="m-2">
+    <DataTable :value="data.datasets[0].data" class="m-2">
       <template #header> ときわ </template>
       <Column field="station" header="駅" />
       <Column field="time" header="時刻">
@@ -24,7 +30,7 @@
 
 <script lang="ts">
 import "chartjs-adapter-date-fns";
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useStore } from "@/store";
 import { ChartData, PluginChartOptions, ChartOptions } from "chart.js";
 
@@ -34,10 +40,12 @@ import {
   formatDdHhmmToHhmm,
 } from "@/logics/diagram";
 import { DiagramData } from "@/types/diagram";
+import Chart from "primevue/chart";
 
 type lineChartData = ChartData<"line", { x: string; y: number }[]>;
 
 const graphOptions = {
+  tension: 0,
   animation: {
     duration: 50,
   },
@@ -90,51 +98,43 @@ const graphOptions = {
 
 export default defineComponent({
   setup() {
-    const store = useStore();
-    const labels = store.getters.getJunctionStationNameList;
-    const ltdExp = store.getters.getTrainType("特急");
-    const terminalStation = store.getters.getTerminalStation;
-    const startTime = "14 04:30";
-    const ltdExpArray = computed(() => {
-      if (!ltdExp) return [];
-      return [...ltdExp.necessaryTimes.values()];
-    });
-    const ltdExpData = ref<DiagramData[]>([]);
-    ltdExpData.value = ltdExp
-      ? generateChartData(startTime, ltdExp, terminalStation)
-      : [];
+    const chartComponent = ref<Chart>();
 
-    const data = computed(() => {
-      return {
-        labels,
-        datasets: [
-          {
-            label: "ときわ",
-            data: ltdExpData.value,
-            fill: false,
-            borderColor: "#FF2222",
-            tension: 0,
-          },
-        ],
-      };
+    const store = useStore();
+    const ltdExp = computed(() => store.getters.getTrainType(1));
+    const terminalStation = computed(() => store.getters.getTerminalStation);
+    const ltdExpArray = computed(() => {
+      if (!ltdExp.value) return [];
+      return [...ltdExp.value.necessaryTimes.values()];
     });
+
+    const data = computed(() => store.getters.getChartJsData);
+    const ltdExpData = computed(() => data.value.datasets[0].data);
 
     const addRound = () => {
       const currentTime = ltdExpData.value[ltdExpData.value.length - 1].time;
       const startTime = addMinute(currentTime, 10);
-      const newRound = ltdExp
-        ? generateChartData(startTime, ltdExp, terminalStation)
+      const newRound = ltdExp.value
+        ? generateChartData(startTime, ltdExp.value, terminalStation.value)
         : [];
-      ltdExpData.value = ltdExpData.value.concat(newRound);
+      store.commit("updateDiagramData", {
+        id: 1,
+        data: ltdExpData.value.concat(newRound),
+      });
+      chartComponent.value?.refresh();
     };
+
     return {
       data,
       graphOptions,
-      ltdExpData,
       ltdExpArray,
       addRound,
       formatDdHhmmToHhmm,
+      chartComponent,
     };
+  },
+  components: {
+    Chart,
   },
 });
 </script>

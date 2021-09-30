@@ -24,6 +24,7 @@ export interface NecessaryTime {
 }
 
 export interface TrainType {
+  id: number;
   name: string;
   necessaryTimes: Map<String, NecessaryTime>;
 }
