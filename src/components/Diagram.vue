@@ -7,7 +7,11 @@
     <DataTable :value="ltdExpData" class="m-2">
       <template #header> ときわ </template>
       <Column field="station" header="駅" />
-      <Column field="time" header="時刻" />
+      <Column field="time" header="時刻">
+        <template #body="slotProps">
+          {{ formatDdHhmmToHhmm(slotProps.data.time) }}
+        </template>
+      </Column>
     </DataTable>
     <DataTable :value="ltdExpArray" class="m-2">
       <template #header> 所要時間 </template>
@@ -24,7 +28,11 @@ import { computed, defineComponent, ref } from "vue";
 import { useStore } from "@/store";
 import { ChartData, PluginChartOptions, ChartOptions } from "chart.js";
 
-import { addMinute, generateChartData } from "@/logics/diagram";
+import {
+  addMinute,
+  generateChartData,
+  formatDdHhmmToHhmm,
+} from "@/logics/diagram";
 import { DiagramData } from "@/types/diagram";
 
 type lineChartData = ChartData<"line", { x: string; y: number }[]>;
@@ -119,7 +127,14 @@ export default defineComponent({
         : [];
       ltdExpData.value = ltdExpData.value.concat(newRound);
     };
-    return { data, graphOptions, ltdExpData, ltdExpArray, addRound };
+    return {
+      data,
+      graphOptions,
+      ltdExpData,
+      ltdExpArray,
+      addRound,
+      formatDdHhmmToHhmm,
+    };
   },
 });
 </script>

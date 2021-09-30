@@ -2,6 +2,10 @@ import { TerminalStation, TrainType } from '@/types';
 import { DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
 
+export const formatDdHhmmToHhmm = (time: string) => {
+  return dayjs(`2021-10-${time}`, 'YYYY-MM-DD HH:mm').format('HH:mm');
+};
+
 export const addMinute = (time: string, addingMinutes: number) => {
   return dayjs(`2021-10-${time}`, 'YYYY-MM-DD HH:mm')
     .add(addingMinutes, 'minute')
