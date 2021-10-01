@@ -23,10 +23,14 @@ export interface NecessaryTime {
   necessaryTime: number;
 }
 
+export type NecessaryTimeMap = Map<String, NecessaryTime>;
+
 export interface TrainType {
   id: number;
   name: string;
-  necessaryTimes: Map<String, NecessaryTime>;
+  necessaryTimesA: NecessaryTimeMap;
+  necessaryTimesB: NecessaryTimeMap;
+  stoppingStationList: string[];
 }
 
 export interface TerminalStation {

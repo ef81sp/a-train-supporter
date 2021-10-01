@@ -7,7 +7,7 @@ import {
 } from '@/types';
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
-import { chartJsData, DiagramData } from '@/types/diagram';
+import { chartJsData, chartJsDataSet, DiagramData } from '@/types/diagram';
 
 export interface State {
   stationList: StationList;
@@ -17,10 +17,11 @@ export interface State {
 
 export interface Getters {
   getStationNameList: string[];
-  getJunctionStationNameList: string[];
+  getShouldRecordTimeStationNameList: string[];
   getTerminalStation: TerminalStation;
   getTrainType: (key: number) => TrainType | undefined;
   getDiagramData: chartJsData;
+  getTrainDiagramDataSetById: (id: number) => chartJsDataSet | undefined;
 }
 
 export interface Mutations {
@@ -63,7 +64,7 @@ export default createStore<State>({
         {
           id: 1,
           name: '特急',
-          necessaryTimes: new Map<string, NecessaryTime>([
+          necessaryTimesA: new Map<string, NecessaryTime>([
             [
               '上野-松戸',
               { from: '上野', to: '松戸', necessaryTime: 17, id: '上野-松戸' },
@@ -72,6 +73,8 @@ export default createStore<State>({
               '松戸-柏',
               { from: '松戸', to: '柏', necessaryTime: 4, id: '松戸-柏' },
             ],
+          ]),
+          necessaryTimesB: new Map<string, NecessaryTime>([
             [
               '柏-松戸',
               { from: '柏', to: '松戸', necessaryTime: 4, id: '柏-松戸' },
@@ -81,6 +84,7 @@ export default createStore<State>({
               { from: '松戸', to: '上野', necessaryTime: 17, id: '松戸-上野' },
             ],
           ]),
+          stoppingStationList: ['上野', '柏'],
         },
       ],
     ]),
@@ -88,15 +92,15 @@ export default createStore<State>({
       labels: ['上野', '北千住', '松戸', '柏'],
       datasets: [
         {
-          label: 'ときわ-1',
+          label: '特急-1',
           id: 1,
           data: [
-            { time: '14 04:30', station: '上野' },
-            { time: '14 04:47', station: '松戸' },
-            { time: '14 04:51', station: '柏' },
-            { time: '14 05:01', station: '柏' },
-            { time: '14 05:05', station: '松戸' },
-            { time: '14 05:22', station: '上野' },
+            { time: '2021-10-14 04:30', station: '上野' },
+            { time: '2021-10-14 04:47', station: '松戸' },
+            { time: '2021-10-14 04:51', station: '柏' },
+            { time: '2021-10-14 05:01', station: '柏' },
+            { time: '2021-10-14 05:05', station: '松戸' },
+            { time: '2021-10-14 05:22', station: '上野' },
           ],
           borderColor: '#FF2222',
         },
@@ -107,9 +111,9 @@ export default createStore<State>({
     getStationNameList({ stationList }): Getters['getStationNameList'] {
       return stationList.stations.map((v: Station) => v.name);
     },
-    getJunctionStationNameList({
+    getShouldRecordTimeStationNameList({
       stationList,
-    }): Getters['getJunctionStationNameList'] {
+    }): Getters['getShouldRecordTimeStationNameList'] {
       return stationList.stations
         .filter((v) => v.shouldRecordTime)
         .map((v) => v.name);
@@ -126,6 +130,11 @@ export default createStore<State>({
     getDiagramData({ diagramData: chartJsData }): Getters['getDiagramData'] {
       return chartJsData;
     },
+    getTrainDiagramDataSetById({
+      diagramData,
+    }): Getters['getTrainDiagramDataSetById'] {
+      return (id) => diagramData.datasets.find((v) => v.id === id);
+    },
   },
   mutations: {
     updateStationList({ diagramData: chartJsData }: State, stations: string[]) {
@@ -137,7 +146,13 @@ export default createStore<State>({
     ) {
       const target = chartJsData.datasets.find((v) => v.id === id);
       if (target) {
-        target.data = data;
+        target.data = dedupe(data);
+      }
+
+      function dedupe(array: DiagramData[]) {
+        return [
+          ...new Map(array.map((v) => [Object.values(v).join(), v])).values(),
+        ];
       }
     },
   },

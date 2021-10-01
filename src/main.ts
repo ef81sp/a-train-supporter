@@ -13,6 +13,9 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ScrollPanel from 'primevue/scrollpanel';
 import Panel from 'primevue/panel';
+import Calendar from 'primevue/calendar';
+import InputNumber from 'primevue/inputnumber';
+import RadioButton from 'primevue/radiobutton';
 
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -31,4 +34,7 @@ createApp(App)
   .component('Column', Column)
   .component('ScrollPanel', ScrollPanel)
   .component('Panel', Panel)
+  .component('Calendar', Calendar)
+  .component('InputNumber', InputNumber)
+  .component('RadioButton', RadioButton)
   .mount('#app');
