@@ -13,6 +13,7 @@ export interface State {
   stationList: StationList;
   trainTypes: Map<number, TrainType>;
   diagramData: chartJsData;
+  showingTrainId: number;
 }
 
 export interface Getters {
@@ -33,6 +34,7 @@ export interface Mutations {
     { diagramData: chartJsData }: State,
     { id, data }: { id: number; data: DiagramData[] }
   ) => void;
+  setShowingTrainId: (state: State, id: number) => void;
 }
 
 // getters等々に補完が効かないのきつすぎる
@@ -85,6 +87,7 @@ export default createStore<State>({
             ],
           ]),
           stoppingStationList: ['上野', '松戸', '柏'],
+          trainIdList: [1, 5],
         },
       ],
     ]),
@@ -104,8 +107,15 @@ export default createStore<State>({
           ],
           borderColor: '#FF2222',
         },
+        {
+          label: '特急-2',
+          id: 5,
+          data: [],
+          borderColor: '#FF2222',
+        },
       ],
     },
+    showingTrainId: 1,
   },
   getters: {
     getStationNameList({ stationList }): Getters['getStationNameList'] {
@@ -137,14 +147,14 @@ export default createStore<State>({
     },
   },
   mutations: {
-    updateStationList({ diagramData: chartJsData }: State, stations: string[]) {
-      chartJsData.labels = stations;
+    updateStationList(state, stations: string[]) {
+      state.diagramData.labels = stations;
     },
     updateDiagramData(
-      { diagramData: chartJsData }: State,
+      state,
       { id, data }: { id: number; data: DiagramData[] }
     ) {
-      const target = chartJsData.datasets.find((v) => v.id === id);
+      const target = state.diagramData.datasets.find((v) => v.id === id);
       if (target) {
         target.data = dedupe(data);
       }
@@ -154,6 +164,9 @@ export default createStore<State>({
           ...new Map(array.map((v) => [Object.values(v).join(), v])).values(),
         ];
       }
+    },
+    setShowingTrainId(state, id: number) {
+      state.showingTrainId = id;
     },
   },
   actions: {},

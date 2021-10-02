@@ -25,7 +25,7 @@
     <div class="col">
       <Panel header="時刻" class="my-2">
         <DiagramTimeTableManager
-          :diagramDataSetId="1"
+          :diagramDataSetId="showingTrainId"
           :trainTypeId="1"
           :refreshChart="chartComponent?.refresh"
         />
@@ -111,12 +111,15 @@ export default defineComponent({
 
     const data = computed(() => store.state.diagramData);
 
+    const showingTrainId = computed(() => store.state.showingTrainId);
+
     return {
       data,
       graphOptions,
       ltdExp,
       formatDdHhmmToHhmm,
       chartComponent,
+      showingTrainId,
     };
   },
 });

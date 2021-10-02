@@ -175,6 +175,8 @@ export default defineComponent({
       ).toDate();
     });
 
+    const showingTrainId = computed(() => store.state.showingTrainId);
+
     const add = () => {
       if (!selectedDiagramDataSet.value) return;
       if (!props.trainTypeId) return;
@@ -183,7 +185,7 @@ export default defineComponent({
       if (!trainType) return;
 
       store.commit("updateDiagramData", {
-        id: 1,
+        id: showingTrainId.value,
         data: [
           ...selectedDiagramDataSet.value?.data,
           ...generateChartData({

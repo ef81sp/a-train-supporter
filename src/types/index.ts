@@ -31,6 +31,7 @@ export interface TrainType {
   necessaryTimesA: NecessaryTimeMap;
   necessaryTimesB: NecessaryTimeMap;
   stoppingStationList: string[];
+  trainIdList: number[];
 }
 
 export interface TerminalStation {

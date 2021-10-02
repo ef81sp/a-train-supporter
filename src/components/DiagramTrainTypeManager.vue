@@ -3,9 +3,15 @@
     <template #icons>
       <Button class="p-button-sm m-0"> 1編成ふやす </Button>
     </template>
-    <div>
-      <Button class="m-1 p-button-sm">1</Button>
-      <Button class="m-1 p-button-sm">2</Button>
+    <div v-if="trainType">
+      <Button
+        class="m-1 p-button-sm"
+        v-for="(id, idx) in trainType.trainIdList"
+        :key="id"
+        @click="changeTrainId(id)"
+      >
+        {{ idx + 1 }}
+      </Button>
     </div>
     <DiagramTrainTypeNecessaryTimeTable
       headerText="A線"
@@ -37,8 +43,13 @@ export default defineComponent({
     const trainType = computed(() =>
       store.getters.getTrainType(props.trainTypeId || 0)
     );
+
+    const changeTrainId = (id: number) => {
+      store.commit("setShowingTrainId", id);
+    };
     return {
       trainType,
+      changeTrainId,
     };
   },
 });
