@@ -17,12 +17,26 @@ export const addMinute = (time: string, addingMinutes: number) => {
     .format('YYYY-MM-DD HH:mm');
 };
 
+export const roundMinute = (
+  time: string,
+  targetUnitMinutes: number
+): string => {
+  const parsedTime = dayjs(time, 'YYYY-MM-DD HH:mm');
+  const parsedMinute = parsedTime.get('minute');
+  const __targetUnitMinutes = targetUnitMinutes === 0 ? 60 : targetUnitMinutes;
+  let targetMinute = __targetUnitMinutes;
+  while (parsedMinute >= targetMinute) {
+    targetMinute += __targetUnitMinutes;
+  }
+  return parsedTime.minute(targetMinute).format('YYYY-MM-DD HH:mm');
+};
+
 export const generateChartData = ({
   startTime,
   trainType,
   startStation,
   endStation,
-  turnWaitingMinute = 10,
+  turnCycleTime = 30,
   boundFor,
   terminalStation,
 }: {
@@ -30,7 +44,7 @@ export const generateChartData = ({
   trainType: TrainType;
   startStation: string;
   endStation: string;
-  turnWaitingMinute?: number;
+  turnCycleTime?: number;
   boundFor: 'A' | 'B' | 'AB' | 'BA';
   terminalStation: TerminalStation;
 }) => {
@@ -64,7 +78,7 @@ export const generateChartData = ({
         (necessaryTime.from === terminalStation.endingStationName ||
           necessaryTime.from === terminalStation.startingStationName)
       ) {
-        currentTime = addMinute(currentTime, turnWaitingMinute);
+        currentTime = roundMinute(currentTime, turnCycleTime);
         result.push({ station: necessaryTime.from, time: currentTime });
       }
 

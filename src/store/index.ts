@@ -84,7 +84,7 @@ export default createStore<State>({
               { from: '松戸', to: '上野', necessaryTime: 17, id: '松戸-上野' },
             ],
           ]),
-          stoppingStationList: ['上野', '柏'],
+          stoppingStationList: ['上野', '松戸', '柏'],
         },
       ],
     ]),
