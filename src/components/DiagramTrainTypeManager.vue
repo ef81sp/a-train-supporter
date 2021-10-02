@@ -1,7 +1,7 @@
 <template>
   <Panel :header="trainType?.name">
     <template #icons>
-      <Button class="p-button-sm m-0"> 1編成ふやす </Button>
+      <Button class="p-button-sm m-0" @click="addTrain"> 1編成ふやす </Button>
     </template>
     <div v-if="trainType">
       <Button
@@ -47,9 +47,12 @@ export default defineComponent({
     const changeTrainId = (id: number) => {
       store.commit("setShowingTrainId", id);
     };
+
+    const addTrain = () => store.dispatch("addTrain", trainType.value?.id);
     return {
       trainType,
       changeTrainId,
+      addTrain,
     };
   },
 });

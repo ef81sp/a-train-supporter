@@ -14,6 +14,7 @@ export interface State {
   trainTypes: Map<number, TrainType>;
   diagramData: chartJsData;
   showingTrainId: number;
+  nextTrainId: number;
 }
 
 export interface Getters {
@@ -88,6 +89,7 @@ export default createStore<State>({
           ]),
           stoppingStationList: ['上野', '松戸', '柏'],
           trainIdList: [1, 5],
+          defaultBorderColor: '#FF2222',
         },
       ],
     ]),
@@ -116,6 +118,7 @@ export default createStore<State>({
       ],
     },
     showingTrainId: 1,
+    nextTrainId: 6,
   },
   getters: {
     getStationNameList({ stationList }): Getters['getStationNameList'] {
@@ -168,8 +171,33 @@ export default createStore<State>({
     setShowingTrainId(state, id: number) {
       state.showingTrainId = id;
     },
+    addTrain(
+      state,
+      { trainTypeId, trainId }: { trainTypeId: number; trainId: number }
+    ) {
+      const trainType = state.trainTypes.get(trainTypeId);
+      if (!trainType) return;
+
+      trainType.trainIdList.push(trainId);
+      const label = `${trainType.name}-${trainType.trainIdList.length}`;
+      state.diagramData.datasets.push({
+        label,
+        id: trainId,
+        data: [],
+        borderColor: trainType.defaultBorderColor,
+      });
+    },
+    incrementTrainId(state) {
+      state.nextTrainId++;
+    },
   },
-  actions: {},
+  actions: {
+    addTrain(context, trainTypeId) {
+      const nextTrainId = context.state.nextTrainId;
+      context.commit('addTrain', { trainTypeId, trainId: nextTrainId });
+      context.commit('incrementTrainId');
+    },
+  },
   modules: {},
 });
 
