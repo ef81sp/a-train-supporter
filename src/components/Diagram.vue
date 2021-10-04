@@ -1,12 +1,17 @@
 <template>
   <div class="grid p-1">
+    <div class="col-12">
+      <Panel header="基本設定" :toggleable="true">
+        <DiagramStationManager />
+      </Panel>
+    </div>
     <div class="col-8">
       <Panel header="ダイヤグラム" class="my-2">
         <Chart
           type="line"
           :data="data"
           :options="graphOptions"
-          ref="chartComponent"
+          ref="chartRef"
           :height="100"
         />
       </Panel>
@@ -30,7 +35,7 @@
         <DiagramTimeTableManager
           :diagramDataSetId="showingTrainId"
           :trainTypeId="1"
-          :refreshChart="chartComponent?.refresh"
+          :refreshChart="chartRef?.refresh"
         />
       </Panel>
     </div>
@@ -47,69 +52,17 @@ import Chart from "primevue/chart";
 
 import DiagramTimeTableManager from "./DiagramTimeTableManager.vue";
 import DiagramTrainTypeManager from "./DiagramTrainTypeManager.vue";
-
-const graphOptions = {
-  tension: 0,
-  animation: {
-    duration: 50,
-  },
-  responsive: true,
-  maintainAspectRatio: true,
-  parsing: {
-    xAxisKey: "time",
-    yAxisKey: "station",
-  },
-  indexAxis: "y",
-  showLine: true,
-  plugins: {
-    legend: {
-      labels: {
-        color: "#495057",
-      },
-    },
-  },
-  spanGaps: 1000 * 60 * 60 * 24 * 1,
-  scales: {
-    x: {
-      min: "2021-10-14 04:00",
-      suggestedMin: "2021-10-14 12:00",
-      // max: "2021-10-15 02:00",
-      type: "time",
-      time: {
-        parser: "yyyy-MM-dd HH:mm",
-        unit: "minute",
-        stepSize: 5,
-        displayFormats: { minute: "HH:mm" },
-        tooltipFormat: "HH:mm",
-      },
-      ticks: {
-        color: "#495057",
-      },
-      grid: {
-        color: "#ebedef",
-      },
-      position: "top",
-    },
-    y: {
-      ticks: {
-        color: "#495057",
-        source: "labels",
-      },
-      grid: {
-        color: "#ebedef",
-      },
-    },
-  },
-};
+import DiagramStationManager from "./DiagramStationManager.vue";
 
 export default defineComponent({
   components: {
     Chart,
     DiagramTimeTableManager,
     DiagramTrainTypeManager,
+    DiagramStationManager,
   },
   setup() {
-    const chartComponent = ref<Chart>();
+    const chartRef = ref<Chart>();
     const graphOptions = computed(() => ({
       tension: 0,
       animation: {
@@ -132,7 +85,9 @@ export default defineComponent({
       },
       scales: {
         x: {
-          min: store.getters.getMinAndMaxTimeOnDiagramData.min,
+          min:
+            store.getters.getMinAndMaxTimeOnDiagramData.min ||
+            "2021-10-14: 04:30",
           max: store.getters.getMinAndMaxTimeOnDiagramData.max,
           type: "time",
           time: {
@@ -170,13 +125,17 @@ export default defineComponent({
 
     const showingTrainId = computed(() => store.state.showingTrainId);
 
+    onMounted(() => {
+      store.commit("setChartRefresh", chartRef.value?.refresh);
+    });
+
     return {
       data,
       graphOptions,
       ltdExp,
       trainTypes,
       formatDdHhmmToHhmm,
-      chartComponent,
+      chartRef,
       showingTrainId,
     };
   },

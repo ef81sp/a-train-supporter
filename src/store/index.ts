@@ -18,6 +18,7 @@ export interface State {
   diagramData: chartJsData;
   showingTrainId: number;
   nextTrainId: number;
+  __chartRefresh: () => void;
 }
 
 export interface Getters {
@@ -116,12 +117,12 @@ export default createStore<State>({
           label: '特急-1',
           id: 1,
           data: [
-            { time: '2021-10-14 04:30', station: '上野' },
-            { time: '2021-10-14 04:47', station: '松戸' },
-            { time: '2021-10-14 04:51', station: '柏' },
-            { time: '2021-10-14 05:01', station: '柏' },
-            { time: '2021-10-14 05:05', station: '松戸' },
-            { time: '2021-10-14 05:22', station: '上野' },
+            // { time: '2021-10-14 04:30', station: '上野' },
+            // { time: '2021-10-14 04:47', station: '松戸' },
+            // { time: '2021-10-14 04:51', station: '柏' },
+            // { time: '2021-10-14 05:01', station: '柏' },
+            // { time: '2021-10-14 05:05', station: '松戸' },
+            // { time: '2021-10-14 05:22', station: '上野' },
           ],
           borderColor: '#FF2222',
         },
@@ -129,6 +130,7 @@ export default createStore<State>({
     },
     showingTrainId: 1,
     nextTrainId: 6,
+    __chartRefresh: () => void 0,
   },
   getters: {
     getStationNameList({ stationList }): Getters['getStationNameList'] {
@@ -194,8 +196,12 @@ export default createStore<State>({
     },
   },
   mutations: {
-    updateStationList(state, stations: string[]) {
-      state.diagramData.labels = stations;
+    updateStationList(state, stations: Station[]) {
+      state.diagramData.labels = stations
+        .filter((v) => v.shouldRecordTime)
+        .map((v) => v.name);
+      state.stationList.stations = stations;
+      state.__chartRefresh();
     },
     updateDiagramData(
       state,
@@ -237,6 +243,9 @@ export default createStore<State>({
     },
     incrementTrainId(state) {
       state.nextTrainId++;
+    },
+    setChartRefresh(state, chartRef) {
+      state.__chartRefresh = chartRef;
     },
   },
   actions: {

@@ -15,6 +15,7 @@ import ScrollPanel from 'primevue/scrollpanel';
 import Panel from 'primevue/panel';
 import Calendar from 'primevue/calendar';
 import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
 
 import 'primevue/resources/themes/saga-blue/theme.css';
@@ -36,5 +37,6 @@ createApp(App)
   .component('Panel', Panel)
   .component('Calendar', Calendar)
   .component('InputNumber', InputNumber)
+  .component('InputText', InputText)
   .component('RadioButton', RadioButton)
   .mount('#app');

@@ -150,13 +150,15 @@ export default defineComponent({
 
     nextDepartureTime.value = selectedDiagramDataSet.value?.data.length
       ? dayjs(
-          selectedDiagramDataSet.value.data[
-            selectedDiagramDataSet.value.data.length - 1
-          ].time
-        )
-          .add(8, "m")
-          .toDate()
-      : dayjs("2021-10-14 04:00:00").toDate();
+          roundMinute(
+            selectedDiagramDataSet.value.data[
+              selectedDiagramDataSet.value.data.length - 1
+            ].time,
+            turnCycleTime.value
+          ),
+          DATE_FORMAT
+        ).toDate()
+      : dayjs("2021-10-14 04:30:00").toDate();
 
     watch(latestDataOnTheList, (newData) => {
       if (!newData) return;
