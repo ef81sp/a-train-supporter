@@ -17,6 +17,9 @@ import Calendar from 'primevue/calendar';
 import InputNumber from 'primevue/inputnumber';
 import InputText from 'primevue/inputtext';
 import RadioButton from 'primevue/radiobutton';
+import Timeline from 'primevue/timeline';
+import Checkbox from 'primevue/checkbox';
+import Inplace from 'primevue/inplace';
 
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -39,4 +42,8 @@ createApp(App)
   .component('InputNumber', InputNumber)
   .component('InputText', InputText)
   .component('RadioButton', RadioButton)
+  .component('Timeline', Timeline)
+  .component('Checkbox', Checkbox)
+  .component('Inplace', Inplace)
+
   .mount('#app');
