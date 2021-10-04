@@ -104,6 +104,7 @@ import {
 } from "@/logics/diagram";
 import dayjs from "dayjs";
 import { useStore } from "@/store";
+import { DATE_FORMAT } from "@/common/const";
 export default defineComponent({
   props: {
     diagramDataSetId: { type: Number, default: undefined },
@@ -161,7 +162,7 @@ export default defineComponent({
       if (!newData) return;
       nextDepartureTime.value = dayjs(
         roundMinute(newData.time, turnCycleTime.value),
-        "YYYY-MM-DD HH:mm"
+        DATE_FORMAT
       ).toDate();
       startStation.value = newData.station;
       endStation.value = newData.station;
@@ -171,7 +172,7 @@ export default defineComponent({
       if (!latestDataOnTheList.value) return;
       nextDepartureTime.value = dayjs(
         roundMinute(latestDataOnTheList.value.time, newCycleTime),
-        "YYYY-MM-DD HH:mm"
+        DATE_FORMAT
       ).toDate();
     });
 

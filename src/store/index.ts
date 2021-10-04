@@ -8,6 +8,9 @@ import {
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
 import { chartJsData, chartJsDataSet, DiagramData } from '@/types/diagram';
+import { max } from 'date-fns';
+import dayjs from 'dayjs';
+import { DATE_FORMAT } from '@/common/const';
 
 export interface State {
   stationList: StationList;
@@ -23,6 +26,7 @@ export interface Getters {
   getTerminalStation: TerminalStation;
   getTrainType: (key: number) => TrainType | undefined;
   getDiagramData: chartJsData;
+  getMinAndMaxTimeOnDiagramData: { min: string; max: string };
   getTrainDiagramDataSetById: (id: number) => chartJsDataSet | undefined;
 }
 
@@ -88,8 +92,20 @@ export default createStore<State>({
             ],
           ]),
           stoppingStationList: ['上野', '松戸', '柏'],
-          trainIdList: [1, 5],
+          trainIdList: [1],
           defaultBorderColor: '#FF2222',
+        },
+      ],
+      [
+        2,
+        {
+          id: 2,
+          name: '普通',
+          necessaryTimesA: new Map(),
+          necessaryTimesB: new Map(),
+          stoppingStationList: ['上野', '北千住', '松戸', '柏'],
+          trainIdList: [],
+          defaultBorderColor: '22FF22',
         },
       ],
     ]),
@@ -107,12 +123,6 @@ export default createStore<State>({
             { time: '2021-10-14 05:05', station: '松戸' },
             { time: '2021-10-14 05:22', station: '上野' },
           ],
-          borderColor: '#FF2222',
-        },
-        {
-          label: '特急-2',
-          id: 5,
-          data: [],
           borderColor: '#FF2222',
         },
       ],
@@ -140,8 +150,42 @@ export default createStore<State>({
     getTrainType({ trainTypes }): Getters['getTrainType'] {
       return (key: number) => trainTypes.get(key);
     },
-    getDiagramData({ diagramData: chartJsData }): Getters['getDiagramData'] {
-      return chartJsData;
+    getDiagramData({ diagramData }: State): Getters['getDiagramData'] {
+      return diagramData;
+    },
+    getMinAndMaxTimeOnDiagramData({
+      diagramData,
+    }: State): Getters['getMinAndMaxTimeOnDiagramData'] {
+      const result = diagramData.datasets.reduce(
+        (prev, cur, idx) => {
+          if (cur.data.length === 0) return prev;
+          const lastItemIdx = cur.data.length - 1;
+          if (idx === 0) {
+            return { min: cur.data[0].time, max: cur.data[lastItemIdx].time };
+          }
+          return {
+            min: dayjs(cur.data[0].time, DATE_FORMAT).isBefore(
+              dayjs(prev.min, DATE_FORMAT)
+            )
+              ? cur.data[0].time
+              : prev.min,
+            max: dayjs(cur.data[lastItemIdx].time, DATE_FORMAT).isAfter(
+              dayjs(prev.max, DATE_FORMAT)
+            )
+              ? cur.data[lastItemIdx].time
+              : prev.max,
+          };
+        },
+        { min: '', max: '' }
+      );
+
+      result.min = dayjs(result.min, DATE_FORMAT)
+        .subtract(15, 'minute')
+        .format(DATE_FORMAT);
+      result.max = dayjs(result.max, DATE_FORMAT)
+        .add(15, 'minute')
+        .format(DATE_FORMAT);
+      return result;
     },
     getTrainDiagramDataSetById({
       diagramData,
@@ -159,7 +203,11 @@ export default createStore<State>({
     ) {
       const target = state.diagramData.datasets.find((v) => v.id === id);
       if (target) {
-        target.data = dedupe(data);
+        target.data = dedupe(data).sort((a, b) => {
+          return dayjs(a.time, DATE_FORMAT).isBefore(dayjs(b.time, DATE_FORMAT))
+            ? -1
+            : 1;
+        });
       }
 
       function dedupe(array: DiagramData[]) {

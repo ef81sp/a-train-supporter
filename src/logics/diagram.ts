@@ -1,3 +1,4 @@
+import { DATE_FORMAT } from '@/common/const';
 import {
   NecessaryTime,
   NecessaryTimeMap,
@@ -8,27 +9,27 @@ import { DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
 
 export const formatDdHhmmToHhmm = (time: string) => {
-  return dayjs(time, 'YYYY-MM-DD HH:mm').format('HH:mm');
+  return dayjs(time, DATE_FORMAT).format('HH:mm');
 };
 
 export const addMinute = (time: string, addingMinutes: number) => {
-  return dayjs(time, 'YYYY-MM-DD HH:mm')
+  return dayjs(time, DATE_FORMAT)
     .add(addingMinutes, 'minute')
-    .format('YYYY-MM-DD HH:mm');
+    .format(DATE_FORMAT);
 };
 
 export const roundMinute = (
   time: string,
   targetUnitMinutes: number
 ): string => {
-  const parsedTime = dayjs(time, 'YYYY-MM-DD HH:mm');
+  const parsedTime = dayjs(time, DATE_FORMAT);
   const parsedMinute = parsedTime.get('minute');
   const __targetUnitMinutes = targetUnitMinutes === 0 ? 60 : targetUnitMinutes;
   let targetMinute = __targetUnitMinutes;
   while (parsedMinute >= targetMinute) {
     targetMinute += __targetUnitMinutes;
   }
-  return parsedTime.minute(targetMinute).format('YYYY-MM-DD HH:mm');
+  return parsedTime.minute(targetMinute).format(DATE_FORMAT);
 };
 
 export const generateChartData = ({
