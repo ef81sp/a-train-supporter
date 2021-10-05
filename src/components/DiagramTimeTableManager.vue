@@ -187,7 +187,7 @@ export default defineComponent({
       const trainType = store.getters.getTrainType(props.trainTypeId);
       if (!trainType) return;
 
-      store.commit("updateDiagramData", {
+      store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
         data: [
           ...selectedDiagramDataSet.value?.data,

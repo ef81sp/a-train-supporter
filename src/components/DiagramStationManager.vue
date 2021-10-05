@@ -46,7 +46,7 @@ export default defineComponent({
     const stationList = computed(() => store.state.stationList);
     const newStationName = ref("");
     const addStation = () => {
-      store.commit(
+      store.dispatch(
         "updateStationList",
         stationList.value.stations.concat({
           name:
@@ -64,7 +64,7 @@ export default defineComponent({
             idx === stationListIndex ? !v.shouldRecordTime : v.shouldRecordTime,
         };
       });
-      store.commit("updateStationList", newList);
+      store.dispatch("updateStationList", newList);
     };
 
     const onEnter = (keyCode: number) => {

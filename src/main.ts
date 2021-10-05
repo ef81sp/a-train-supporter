@@ -4,6 +4,9 @@ import './registerServiceWorker';
 import router from './router';
 import store, { key } from './store';
 
+//@ts-expect-error no d.ts file
+import VuexUndoRedo from 'vuex-undo-redo';
+
 import PrimeVue from 'primevue/config';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
@@ -28,6 +31,13 @@ import '/node_modules/primeflex/primeflex.css';
 
 createApp(App)
   .use(store, key)
+  .use(VuexUndoRedo, {
+    ignoreMutations: [
+      'setShowingTrainId',
+      'setChartRefresh',
+      'incrementTrainId',
+    ],
+  })
   .use(router)
   .use(PrimeVue)
   .component('Dropdown', Dropdown)

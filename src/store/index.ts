@@ -11,6 +11,7 @@ import { chartJsData, chartJsDataSet, DiagramData } from '@/types/diagram';
 import { max } from 'date-fns';
 import dayjs from 'dayjs';
 import { DATE_FORMAT } from '@/common/const';
+import clonedeep from 'lodash.clonedeep';
 
 export interface State {
   stationList: StationList;
@@ -19,6 +20,7 @@ export interface State {
   showingTrainId: number;
   nextTrainId: number;
   __chartRefresh: () => void;
+  __history?: { stack: State[]; nowIndex: number };
 }
 
 export interface Getters {
@@ -52,89 +54,112 @@ export interface IStore extends Store<State> {
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
-export default createStore<State>({
-  state: {
-    stationList: {
-      stations: [
-        { name: '上野', shouldRecordTime: true },
-        { name: '日暮里', shouldRecordTime: false },
-        { name: '三河島', shouldRecordTime: false },
-        { name: '南千住', shouldRecordTime: false },
-        { name: '北千住', shouldRecordTime: true },
-        { name: '松戸', shouldRecordTime: true },
-        { name: '柏', shouldRecordTime: true },
-      ],
-      startingStationName: '上野',
-      endingStationName: '柏',
-    },
-    trainTypes: new Map<number, TrainType>([
-      [
-        1,
-        {
-          id: 1,
-          name: '特急',
-          necessaryTimesA: new Map<string, NecessaryTime>([
-            [
-              '上野-松戸',
-              { from: '上野', to: '松戸', necessaryTime: 17, id: '上野-松戸' },
-            ],
-            [
-              '松戸-柏',
-              { from: '松戸', to: '柏', necessaryTime: 4, id: '松戸-柏' },
-            ],
-          ]),
-          necessaryTimesB: new Map<string, NecessaryTime>([
-            [
-              '柏-松戸',
-              { from: '柏', to: '松戸', necessaryTime: 4, id: '柏-松戸' },
-            ],
-            [
-              '松戸-上野',
-              { from: '松戸', to: '上野', necessaryTime: 17, id: '松戸-上野' },
-            ],
-          ]),
-          stoppingStationList: ['上野', '松戸', '柏'],
-          trainIdList: [1],
-          defaultBorderColor: '#FF2222',
-        },
-      ],
-      // [
-      //   2,
-      //   {
-      //     id: 2,
-      //     name: '普通',
-      //     necessaryTimesA: new Map(),
-      //     necessaryTimesB: new Map(),
-      //     stoppingStationList: ['上野', '北千住', '松戸', '柏'],
-      //     trainIdList: [],
-      //     defaultBorderColor: '22FF22',
-      //   },
-      // ],
-    ]),
-    diagramData: {
-      labels: [
-        // '上野', '北千住', '松戸', '柏'
-      ],
-      datasets: [
-        {
-          label: '特急-1',
-          id: 1,
-          data: [
-            { time: '2021-10-14 04:30', station: '上野' },
-            { time: '2021-10-14 04:47', station: '松戸' },
-            { time: '2021-10-14 04:51', station: '柏' },
-            { time: '2021-10-14 05:01', station: '柏' },
-            { time: '2021-10-14 05:05', station: '松戸' },
-            { time: '2021-10-14 05:22', station: '上野' },
-          ],
-          borderColor: '#FF2222',
-        },
-      ],
-    },
-    showingTrainId: 1,
-    nextTrainId: 6,
-    __chartRefresh: () => void 0,
+const initialState: State = {
+  stationList: {
+    stations: [],
+    startingStationName: '',
+    endingStationName: '',
   },
+  trainTypes: new Map<number, TrainType>([]),
+  diagramData: {
+    labels: [],
+    datasets: [],
+  },
+  showingTrainId: 1,
+  nextTrainId: 6,
+  __chartRefresh: () => void 0,
+};
+
+const mockState = {
+  stationList: {
+    stations: [
+      { name: '上野', shouldRecordTime: true },
+      { name: '日暮里', shouldRecordTime: false },
+      { name: '三河島', shouldRecordTime: false },
+      { name: '南千住', shouldRecordTime: false },
+      { name: '北千住', shouldRecordTime: true },
+      { name: '松戸', shouldRecordTime: true },
+      { name: '柏', shouldRecordTime: true },
+    ],
+    startingStationName: '上野',
+    endingStationName: '柏',
+  },
+  trainTypes: new Map<number, TrainType>([
+    [
+      1,
+      {
+        id: 1,
+        name: '特急',
+        necessaryTimesA: new Map<string, NecessaryTime>([
+          [
+            '上野-松戸',
+            { from: '上野', to: '松戸', necessaryTime: 17, id: '上野-松戸' },
+          ],
+          [
+            '松戸-柏',
+            { from: '松戸', to: '柏', necessaryTime: 4, id: '松戸-柏' },
+          ],
+        ]),
+        necessaryTimesB: new Map<string, NecessaryTime>([
+          [
+            '柏-松戸',
+            { from: '柏', to: '松戸', necessaryTime: 4, id: '柏-松戸' },
+          ],
+          [
+            '松戸-上野',
+            { from: '松戸', to: '上野', necessaryTime: 17, id: '松戸-上野' },
+          ],
+        ]),
+        stoppingStationList: ['上野', '松戸', '柏'],
+        trainIdList: [1],
+        defaultBorderColor: '#FF2222',
+      },
+    ],
+    // [
+    //   2,
+    //   {
+    //     id: 2,
+    //     name: '普通',
+    //     necessaryTimesA: new Map(),
+    //     necessaryTimesB: new Map(),
+    //     stoppingStationList: ['上野', '北千住', '松戸', '柏'],
+    //     trainIdList: [],
+    //     defaultBorderColor: '22FF22',
+    //   },
+    // ],
+  ]),
+  diagramData: {
+    labels: [
+      // '上野', '北千住', '松戸', '柏'
+    ],
+    datasets: [
+      {
+        label: '特急-1',
+        id: 1,
+        data: [
+          { time: '2021-10-14 04:30', station: '上野' },
+          { time: '2021-10-14 04:47', station: '松戸' },
+          { time: '2021-10-14 04:51', station: '柏' },
+          { time: '2021-10-14 05:01', station: '柏' },
+          { time: '2021-10-14 05:05', station: '松戸' },
+          { time: '2021-10-14 05:22', station: '上野' },
+        ],
+        borderColor: '#FF2222',
+      },
+    ],
+  },
+  showingTrainId: 1,
+  nextTrainId: 6,
+  __chartRefresh: () => void 0,
+};
+
+export default createStore<State>({
+  state: Object.assign(clonedeep(mockState), {
+    __history: {
+      stack: [mockState],
+      nowIndex: 0,
+    },
+  }),
   getters: {
     getStationNameList({ stationList }): Getters['getStationNameList'] {
       return stationList.stations.map((v: Station) => v.name);
@@ -197,6 +222,12 @@ export default createStore<State>({
     }): Getters['getTrainDiagramDataSetById'] {
       return (id) => diagramData.datasets.find((v) => v.id === id);
     },
+    getHistoryInfo({ __history }): Getters['getHistoryInfo'] {
+      return {
+        nowIndex: __history ? __history.nowIndex : 0,
+        length: __history ? __history.stack.length : 0,
+      };
+    },
   },
   mutations: {
     updateStationList(state, stations: Station[]) {
@@ -252,12 +283,70 @@ export default createStore<State>({
     setChartRefresh(state, chartRef) {
       state.__chartRefresh = chartRef;
     },
+    __logHistory(state) {
+      const copiedState = clonedeep(state);
+      delete copiedState.__history;
+      if (!state.__history) return;
+      state.__history.stack = state.__history.stack.slice(
+        0,
+        state.__history.nowIndex + 1
+      );
+      state.__history.stack.push(copiedState);
+      if (state.__history.stack.length > 100) {
+        state.__history.stack.shift();
+      }
+      state.__history.nowIndex = state.__history.stack.length - 1;
+    },
+    undo(state) {
+      if (!state.__history) return;
+      if (state.__history.stack.length === 0) return;
+      if (state.__history.nowIndex === 0) return;
+
+      const newState = clonedeep(
+        state.__history.stack[state.__history.nowIndex - 1]
+      );
+      Object.assign(
+        state,
+        Object.assign(newState, {
+          __history: {
+            stack: state.__history.stack,
+            nowIndex: state.__history.nowIndex - 1,
+          },
+        })
+      );
+    },
+    redo(state) {
+      if (!state.__history) return;
+      if (state.__history.stack.length === 0) return;
+
+      const newState = clonedeep(
+        state.__history.stack[state.__history.nowIndex + 1]
+      );
+      Object.assign(
+        state,
+        Object.assign(newState, {
+          __history: {
+            stack: state.__history.stack,
+            nowIndex: state.__history.nowIndex + 1,
+          },
+        })
+      );
+    },
   },
   actions: {
     addTrain(context, trainTypeId) {
       const nextTrainId = context.state.nextTrainId;
       context.commit('addTrain', { trainTypeId, trainId: nextTrainId });
       context.commit('incrementTrainId');
+      context.commit('__logHistory');
+    },
+    updateDiagramData(context, payload: { id: number; data: DiagramData[] }) {
+      context.commit('updateDiagramData', payload);
+      context.commit('__logHistory');
+    },
+    updateStationList(context, stations: Station[]) {
+      context.commit('updateStationList', stations);
+      context.commit('__logHistory');
     },
   },
   modules: {},
