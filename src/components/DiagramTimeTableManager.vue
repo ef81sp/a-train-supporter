@@ -16,7 +16,7 @@
           id="startStation"
           v-model="startStation"
           :options="stationList"
-          class="w-10"
+          class="w-10 text-left"
         />
       </div>
       <div class="field col-6">
@@ -31,7 +31,7 @@
           id="endStation"
           v-model="endStation"
           :options="stationList"
-          class="w-10"
+          class="w-10 text-left"
         />
       </div>
       <div class="field col-4">
@@ -42,7 +42,7 @@
           id="boundFor"
           v-model="boundFor"
           :options="['A', 'B', 'AB', 'BA']"
-          class="w-10"
+          class="w-10 text-left"
         />
       </div>
       <div class="field col-4">

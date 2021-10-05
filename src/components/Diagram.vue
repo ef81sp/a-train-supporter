@@ -1,18 +1,18 @@
 <template>
   <div class="grid p-1">
+    <div class="col-12 flex justify-content-end"><DiagramMenuButtons /></div>
     <div class="col-12">
       <Panel header="基本設定" :toggleable="true">
         <DiagramStationManager />
       </Panel>
     </div>
-    <div class="col-8">
+    <div class="col-12 md:col-8">
       <Panel header="ダイヤグラム" class="my-2">
         <Chart
           type="line"
           :data="data"
           :options="graphOptions"
           ref="chartRef"
-          :height="100"
         />
       </Panel>
 
@@ -50,6 +50,7 @@ import { useStore } from "@/store";
 import { formatDdHhmmToHhmm } from "@/logics/diagram";
 import Chart from "primevue/chart";
 
+import DiagramMenuButtons from "./DiagramMenuButtons.vue";
 import DiagramTimeTableManager from "./DiagramTimeTableManager.vue";
 import DiagramTrainTypeManager from "./DiagramTrainTypeManager.vue";
 import DiagramStationManager from "./DiagramStationManager.vue";
@@ -57,6 +58,7 @@ import DiagramStationManager from "./DiagramStationManager.vue";
 export default defineComponent({
   components: {
     Chart,
+    DiagramMenuButtons,
     DiagramTimeTableManager,
     DiagramTrainTypeManager,
     DiagramStationManager,
@@ -69,7 +71,7 @@ export default defineComponent({
         duration: 50,
       },
       responsive: true,
-      maintainAspectRatio: true,
+      aspectRatio: matchMedia("(max-width: 640px)").matches ? 2 : 3,
       parsing: {
         xAxisKey: "time",
         yAxisKey: "station",

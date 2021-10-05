@@ -5,7 +5,7 @@
       v-model="newStationName"
       @keydown.enter="onEnter($event.keyCode)"
     />
-    <Button icon="pi pi-plus" @click="addStation" />
+    <Button icon="pi pi-plus" @click="addStation" label="駅追加" />
   </div>
   <p>チェックをつける: 採時駅</p>
   <div class="station-chart">
@@ -92,5 +92,6 @@ export default defineComponent({
 }
 .station-chart {
   padding: 0 1rem;
+  overflow-x: scroll;
 }
 </style>
