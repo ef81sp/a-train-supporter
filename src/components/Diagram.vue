@@ -18,9 +18,13 @@
 
       <Panel header="種別" class="my-2">
         <template #icons>
-          <Button class="p-button-sm" @click="addInitialTrainType">
-            種別ふやす
-          </Button>
+          <Button
+            class="p-button-sm"
+            icon="pi pi-plus"
+            @click="addInitialTrainType"
+            :disabled="!canAddTrainType"
+            label="種別追加"
+          />
         </template>
         <div class="grid">
           <DiagramTrainTypeManager
@@ -129,6 +133,7 @@ export default defineComponent({
 
     const showingTrainId = computed(() => store.state.showingTrainId);
 
+    const canAddTrainType = computed<boolean>(() => trainTypes.value.size < 6);
     const addInitialTrainType = () => {
       store.dispatch("addInitialTrainType");
     };
@@ -145,6 +150,7 @@ export default defineComponent({
       formatDdHhmmToHhmm,
       chartRef,
       showingTrainId,
+      canAddTrainType,
       addInitialTrainType,
     };
   },
