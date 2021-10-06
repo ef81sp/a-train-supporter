@@ -12,6 +12,10 @@ import { max } from 'date-fns';
 import dayjs from 'dayjs';
 import { DATE_FORMAT } from '@/common/const';
 import clonedeep from 'lodash.clonedeep';
+import {
+  generateInitialNecessaryTime,
+  getRandomLineColor,
+} from '@/logics/diagram';
 
 export interface State {
   stationList: StationList;
@@ -261,6 +265,19 @@ export default createStore<State>({
     setShowingTrainId(state, id: number) {
       state.showingTrainId = id;
     },
+    addInitialTrainType(state) {
+      const newKey = Math.max(...state.trainTypes.keys()) + 1;
+      const newTrainType: TrainType = {
+        id: newKey,
+        name: '',
+        trainIdList: [],
+        stoppingStationList: state.stationList.stations.map((v) => v.name),
+        necessaryTimesA: generateInitialNecessaryTime(state.stationList, 'A'),
+        necessaryTimesB: generateInitialNecessaryTime(state.stationList, 'B'),
+        defaultBorderColor: getRandomLineColor(),
+      };
+      state.trainTypes.set(newKey, newTrainType);
+    },
     addTrain(
       state,
       { trainTypeId, trainId }: { trainTypeId: number; trainId: number }
@@ -339,6 +356,12 @@ export default createStore<State>({
       context.commit('addTrain', { trainTypeId, trainId: nextTrainId });
       context.commit('incrementTrainId');
       context.commit('__logHistory');
+    },
+    addInitialTrainType(context) {
+      context.commit('addInitialTrainType');
+      const newTrainTypeId = Math.max(...context.state.trainTypes.keys())
+      context.dispatch('addTrain', newTrainTypeId)
+      // context.commit('__logHistory'); // addTrain側でやるので省略
     },
     updateDiagramData(context, payload: { id: number; data: DiagramData[] }) {
       context.commit('updateDiagramData', payload);

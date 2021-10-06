@@ -1,5 +1,14 @@
-import { NecessaryTime, TrainType } from '@/types';
-import { roundMinute, generateChartData } from './diagram';
+import {
+  NecessaryTime,
+  NecessaryTimeMap,
+  StationList,
+  TrainType,
+} from '@/types';
+import {
+  roundMinute,
+  generateChartData,
+  generateInitialNecessaryTime,
+} from './diagram';
 
 describe('roundMinute', () => {
   it('通常', () => {
@@ -49,6 +58,8 @@ describe('generateChartData', () => {
       ],
     ]),
     stoppingStationList: ['上野', '柏', '土浦'],
+    trainIdList: [],
+    defaultBorderColor: '#000000',
   };
   const startTime = '2021-10-14 04:30';
   const terminalStation = {
@@ -307,5 +318,63 @@ describe('generateChartData', () => {
         { station: '柏', time: '2021-10-14 05:51' },
       ]);
     });
+  });
+});
+
+describe('generateInitialNecessaryTime', () => {
+  const stationList: StationList = {
+    stations: [
+      { name: '上野', shouldRecordTime: true },
+      { name: '日暮里', shouldRecordTime: false },
+      { name: '三河島', shouldRecordTime: true },
+      { name: '南千住', shouldRecordTime: false },
+      { name: '北千住', shouldRecordTime: true },
+      { name: '松戸', shouldRecordTime: false },
+      { name: '柏', shouldRecordTime: true },
+    ],
+    startingStationName: '上野',
+    endingStationName: '柏',
+  };
+  const expectedNecessaryTimesA: NecessaryTimeMap = new Map<
+    string,
+    NecessaryTime
+  >([
+    [
+      '上野-三河島',
+      { from: '上野', to: '三河島', necessaryTime: 0, id: '上野-三河島' },
+    ],
+    [
+      '三河島-北千住',
+      { from: '三河島', to: '北千住', necessaryTime: 0, id: '三河島-北千住' },
+    ],
+    [
+      '北千住-柏',
+      { from: '北千住', to: '柏', necessaryTime: 0, id: '北千住-柏' },
+    ],
+  ]);
+  const expectedNecessaryTimesB: NecessaryTimeMap = new Map<
+    string,
+    NecessaryTime
+  >([
+    [
+      '柏-北千住',
+      { from: '柏', to: '北千住', necessaryTime: 0, id: '柏-北千住' },
+    ],
+    [
+      '北千住-三河島',
+      { from: '北千住', to: '三河島', necessaryTime: 0, id: '北千住-三河島' },
+    ],
+    [
+      '三河島-上野',
+      { from: '三河島', to: '上野', necessaryTime: 0, id: '三河島-上野' },
+    ],
+  ]);
+  it('bound for A', () => {
+    const result = generateInitialNecessaryTime(stationList, 'A');
+    expect(result).toEqual(expectedNecessaryTimesA);
+  });
+  it('bound for B', () => {
+    const result = generateInitialNecessaryTime(stationList, 'B');
+    expect(result).toEqual(expectedNecessaryTimesB);
   });
 });

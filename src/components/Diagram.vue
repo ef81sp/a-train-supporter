@@ -2,7 +2,7 @@
   <div class="grid p-1">
     <div class="col-12 flex justify-content-end"><DiagramMenuButtons /></div>
     <div class="col-12">
-      <Panel header="基本設定" :toggleable="true">
+      <Panel header="駅設定" :toggleable="true">
         <DiagramStationManager />
       </Panel>
     </div>
@@ -18,7 +18,9 @@
 
       <Panel header="種別" class="my-2">
         <template #icons>
-          <Button class="p-button-sm"> 種別ふやす </Button>
+          <Button class="p-button-sm" @click="addInitialTrainType">
+            種別ふやす
+          </Button>
         </template>
         <div class="grid">
           <DiagramTrainTypeManager
@@ -127,6 +129,10 @@ export default defineComponent({
 
     const showingTrainId = computed(() => store.state.showingTrainId);
 
+    const addInitialTrainType = () => {
+      store.dispatch("addInitialTrainType");
+    };
+
     onMounted(() => {
       store.commit("setChartRefresh", chartRef.value?.refresh);
     });
@@ -139,6 +145,7 @@ export default defineComponent({
       formatDdHhmmToHhmm,
       chartRef,
       showingTrainId,
+      addInitialTrainType,
     };
   },
 });

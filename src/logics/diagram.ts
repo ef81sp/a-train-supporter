@@ -2,11 +2,13 @@ import { DATE_FORMAT } from '@/common/const';
 import {
   NecessaryTime,
   NecessaryTimeMap,
+  StationList,
   TerminalStation,
   TrainType,
 } from '@/types';
 import { DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
+import clonedeep from 'lodash.clonedeep';
 
 export const formatDdHhmmToHhmm = (time: string) => {
   return dayjs(time, DATE_FORMAT).format('HH:mm');
@@ -139,4 +141,42 @@ export const generateChartData = ({
   }
 
   return result;
+};
+
+export const generateInitialNecessaryTime = (
+  stationList: StationList,
+  boundFor: 'A' | 'B'
+): NecessaryTimeMap => {
+  const result: NecessaryTimeMap = new Map();
+  const list = clonedeep(stationList.stations);
+  if (boundFor === 'B') {
+    list.reverse();
+  }
+  let previousStationName = list[0].name;
+  list.forEach((station, idx) => {
+    if (idx === 0) return;
+    if (!station.shouldRecordTime) return;
+    const id = `${previousStationName}-${station.name}`;
+    const item: NecessaryTime = {
+      id,
+      from: previousStationName,
+      to: station.name,
+      necessaryTime: 0,
+    };
+    result.set(id, item);
+    previousStationName = station.name;
+  });
+  return result;
+};
+
+export const getRandomLineColor = () => {
+  const selection = [
+    '#842e36', // ワインレッド
+    '#c16b49', // オレンジバーミリオン
+    '#8fb871', // うぐいす
+    '#008d79', // エメラルドグリーン
+    '#0c3f71', // ブライトブルー
+    '#008aa2', // スカイブルー
+  ];
+  return selection[Math.floor(Math.random() * selection.length)];
 };
