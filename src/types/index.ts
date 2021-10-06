@@ -32,7 +32,7 @@ export interface TrainType {
   necessaryTimesB: NecessaryTimeMap;
   stoppingStationList: string[];
   trainIdList: number[];
-  defaultBorderColor: string;
+  lineColor: string;
 }
 
 export interface TerminalStation {

@@ -116,7 +116,7 @@ const mockState = {
         ]),
         stoppingStationList: ['上野', '松戸', '柏'],
         trainIdList: [1],
-        defaultBorderColor: '#FF2222',
+        lineColor: '#FF2222',
       },
     ],
     // [
@@ -128,7 +128,7 @@ const mockState = {
     //     necessaryTimesB: new Map(),
     //     stoppingStationList: ['上野', '北千住', '松戸', '柏'],
     //     trainIdList: [],
-    //     defaultBorderColor: '22FF22',
+    //     lineColor: '22FF22',
     //   },
     // ],
   ]),
@@ -274,7 +274,7 @@ export default createStore<State>({
         stoppingStationList: state.stationList.stations.map((v) => v.name),
         necessaryTimesA: generateInitialNecessaryTime(state.stationList, 'A'),
         necessaryTimesB: generateInitialNecessaryTime(state.stationList, 'B'),
-        defaultBorderColor: getRandomLineColor(),
+        lineColor: getRandomLineColor(),
       };
       state.trainTypes.set(newKey, newTrainType);
     },
@@ -291,7 +291,7 @@ export default createStore<State>({
         label,
         id: trainId,
         data: [],
-        borderColor: trainType.defaultBorderColor,
+        borderColor: trainType.lineColor,
       });
     },
     incrementTrainId(state) {
@@ -359,8 +359,8 @@ export default createStore<State>({
     },
     addInitialTrainType(context) {
       context.commit('addInitialTrainType');
-      const newTrainTypeId = Math.max(...context.state.trainTypes.keys())
-      context.dispatch('addTrain', newTrainTypeId)
+      const newTrainTypeId = Math.max(...context.state.trainTypes.keys());
+      context.dispatch('addTrain', newTrainTypeId);
       // context.commit('__logHistory'); // addTrain側でやるので省略
     },
     updateDiagramData(context, payload: { id: number; data: DiagramData[] }) {

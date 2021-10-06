@@ -59,7 +59,7 @@ describe('generateChartData', () => {
     ]),
     stoppingStationList: ['上野', '柏', '土浦'],
     trainIdList: [],
-    defaultBorderColor: '#000000',
+    lineColor: '#000000',
   };
   const startTime = '2021-10-14 04:30';
   const terminalStation = {
