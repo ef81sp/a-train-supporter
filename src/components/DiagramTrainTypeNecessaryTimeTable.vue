@@ -15,7 +15,7 @@
         <InputNumber
           :modelValue="data[column.props.field]"
           class="w-3rem"
-          @input="onChangeCellValue"
+          @input="(e) => onChangeCellValue(e, data.id)"
         />
       </template>
     </Column>
@@ -45,7 +45,10 @@ export default defineComponent({
       return [...props.necessaryTimeMap.values()];
     });
     const store = useStore();
-    const necessaryTimeOnCell = ref(0); // Vuex由来の値をv-modelにあてるわけにはいかない
+    const necessaryTimeOnCell = ref({
+      id: "",
+      value: 0,
+    }); // Vuex由来の値をv-modelにあてるわけにはいかない
 
     const onCellEditComplete = (
       e: Event & { data: NecessaryTime; field: string }
@@ -55,9 +58,10 @@ export default defineComponent({
       const newNecessaryTimeMap = clonedeep(props.necessaryTimeMap);
       const target = newNecessaryTimeMap.get(e.data.id);
       if (!target) return;
-      if (target.necessaryTime === necessaryTimeOnCell.value) return;
+      if (target.id !== necessaryTimeOnCell.value.id) return;
+      if (target.necessaryTime === necessaryTimeOnCell.value.value) return;
 
-      target.necessaryTime = necessaryTimeOnCell.value;
+      target.necessaryTime = necessaryTimeOnCell.value.value;
       store.dispatch("updateTrainTypeNecessaryTimeTable", {
         trainTypeId: props.trainTypeId,
         boundFor: props.boundFor,
@@ -65,8 +69,9 @@ export default defineComponent({
       });
     };
 
-    const onChangeCellValue = (e: Event & { value: number }) => {
-      necessaryTimeOnCell.value = e.value;
+    const onChangeCellValue = (e: Event & { value: number }, id: string) => {
+      necessaryTimeOnCell.value.id = id;
+      necessaryTimeOnCell.value.value = e.value;
     };
 
     return {
