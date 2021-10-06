@@ -40,7 +40,6 @@
       <Panel header="時刻" class="my-2">
         <DiagramTimeTableManager
           :diagramDataSetId="showingTrainId"
-          :trainTypeId="1"
           :refreshChart="chartRef?.refresh"
         />
       </Panel>

@@ -33,6 +33,7 @@ export interface Getters {
   getShouldRecordTimeStationNameList: string[];
   getTerminalStation: TerminalStation;
   getTrainType: (key: number) => TrainType | undefined;
+  getTrainTypeByTrainId: (key: number) => TrainType | undefined;
   getDiagramData: chartJsData;
   getMinAndMaxTimeOnDiagramData: { min: string; max: string };
   getTrainDiagramDataSetById: (id: number) => chartJsDataSet | undefined;
@@ -185,6 +186,10 @@ export default createStore<State>({
     getTrainType({ trainTypes }): Getters['getTrainType'] {
       return (key: number) => trainTypes.get(key);
     },
+    getTrainTypeByTrainId({ trainTypes }): Getters['getTrainTypeByTrainId'] {
+      return (key: number) =>
+        [...trainTypes.values()].find((v) => v.trainIdList.includes(key));
+    },
     getDiagramData({ diagramData }: State): Getters['getDiagramData'] {
       return diagramData;
     },
@@ -197,6 +202,12 @@ export default createStore<State>({
           const lastItemIdx = cur.data.length - 1;
           if (idx === 0) {
             return { min: cur.data[0].time, max: cur.data[lastItemIdx].time };
+          }
+          if (prev.min === '' && prev.max === '') {
+            return {
+              min: cur.data[0].time,
+              max: cur.data[lastItemIdx].time,
+            };
           }
           return {
             min: dayjs(cur.data[0].time, DATE_FORMAT).isBefore(
@@ -270,7 +281,7 @@ export default createStore<State>({
       const newKey = Math.max(...state.trainTypes.keys()) + 1;
       const newTrainType: TrainType = {
         id: newKey,
-        name: '',
+        name: `種別${newKey}`,
         trainIdList: [],
         stoppingStationList: state.stationList.stations.map((v) => v.name),
         necessaryTimesA: generateInitialNecessaryTime(state.stationList, 'A'),
@@ -306,6 +317,13 @@ export default createStore<State>({
         id: trainId,
         data: [],
         borderColor: trainType.lineColor,
+      });
+      state.diagramData.datasets.sort((a, b) => {
+        if (a.label < b.label) return -1;
+        if (a.label > b.label) return 1;
+        if (a.data.length === 0 && b.data.length !== 0) return 1;
+        if (b.data.length === 0 && a.data.length !== 0) return -1;
+        return 1;
       });
     },
     incrementTrainId(state) {

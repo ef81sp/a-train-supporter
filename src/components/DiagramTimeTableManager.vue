@@ -1,6 +1,8 @@
 <template>
   <template v-if="selectedDiagramDataSet">
     <p class="font-bold">
+      <span :style="{ color: trainType?.lineColor }">■</span>
+
       {{ selectedDiagramDataSet.label }}
     </p>
     <div class="formgrid grid">
@@ -77,7 +79,7 @@
         />
       </div>
     </div>
-    <Button label="ふやす" @click="add" />
+    <Button label="ふやす" @click="add" :style="buttonColorStyle" />
     <DataTable
       :value="selectedDiagramDataSet?.data"
       :scrollable="true"
@@ -108,7 +110,6 @@ import { DATE_FORMAT } from "@/common/const";
 export default defineComponent({
   props: {
     diagramDataSetId: { type: Number, default: undefined },
-    trainTypeId: { type: Number, default: undefined },
     refreshChart: Function,
   },
   setup(props) {
@@ -121,6 +122,15 @@ export default defineComponent({
     const stationList = computed(
       () => store.getters.getShouldRecordTimeStationNameList
     );
+
+    const trainType = computed(() =>
+      store.getters.getTrainTypeByTrainId(props.diagramDataSetId || 0)
+    );
+
+    const buttonColorStyle = computed(() => ({
+      backgroundColor: trainType.value?.lineColor,
+      borderColor: trainType.value?.lineColor,
+    }));
 
     const selectedDiagramDataSet = computed(() => {
       if (props.diagramDataSetId == undefined) {
@@ -182,10 +192,8 @@ export default defineComponent({
 
     const add = () => {
       if (!selectedDiagramDataSet.value) return;
-      if (!props.trainTypeId) return;
 
-      const trainType = store.getters.getTrainType(props.trainTypeId);
-      if (!trainType) return;
+      if (!trainType.value) return;
 
       store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
@@ -193,7 +201,7 @@ export default defineComponent({
           ...selectedDiagramDataSet.value?.data,
           ...generateChartData({
             startTime: nextDepartureTime.value,
-            trainType,
+            trainType: trainType.value,
             startStation: startStation.value,
             endStation: endStation.value,
             boundFor: boundFor.value,
@@ -211,6 +219,8 @@ export default defineComponent({
       startStation,
       endStation,
       stationList,
+      trainType,
+      buttonColorStyle,
       boundFor,
       formatDdHhmmToHhmm,
       selectedDiagramDataSet,
