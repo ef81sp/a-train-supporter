@@ -20,7 +20,7 @@
               optionValue="value"
               placeholder="線の色"
               v-model="lineColor"
-              class="w-5rem"
+              class="w-4rem"
             >
               <template #value="slotProps">
                 <template v-if="slotProps.value">

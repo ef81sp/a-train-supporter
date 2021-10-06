@@ -3,9 +3,9 @@
     <template #header>
       {{ headerText }}
     </template>
-    <Column field="from" header="発駅" />
-    <Column field="to" header="着駅" />
-    <Column field="necessaryTime" header="所要時間(分)" />
+    <Column field="from" header="発" />
+    <Column field="to" header="着" />
+    <Column field="necessaryTime" header="分" />
     <template #footer>
       合計{{
         necessaryTimeArray.reduce((prev, cur) => prev + cur.necessaryTime, 0)

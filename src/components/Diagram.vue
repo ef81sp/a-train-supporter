@@ -26,7 +26,7 @@
             label="種別追加"
           />
         </template>
-        <div class="grid">
+        <div class="flex overflow-x-scroll">
           <DiagramTrainTypeManager
             v-for="trainTypeId in trainTypes.keys()"
             :key="trainTypeId"
