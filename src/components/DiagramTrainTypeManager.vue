@@ -41,14 +41,24 @@
       </div>
     </template>
     <template #icons>
-      <Button class="p-button-sm m-0" @click="addTrain"> 編成+ </Button>
+      <Button
+        class="p-button-sm m-0"
+        @click="addTrain"
+        :style="buttonColorStyle"
+      >
+        編成+
+      </Button>
     </template>
-    <div v-if="trainType">
+    <div
+      v-if="trainType"
+      class="flex justify-content-center flex-wrap trainIdButton"
+    >
       <Button
         class="m-1 p-button-sm"
         v-for="(id, idx) in trainType.trainIdList"
         :key="id"
         @click="changeTrainId(id)"
+        :style="buttonColorStyle"
       >
         {{ idx + 1 }}
       </Button>
@@ -112,6 +122,11 @@ export default defineComponent({
       });
     };
 
+    const buttonColorStyle = computed(() => ({
+      backgroundColor: lineColor.value,
+      borderColor: lineColor.value,
+    }));
+
     const addTrain = () => store.dispatch("addTrain", trainType.value?.id);
     return {
       trainType,
@@ -121,7 +136,15 @@ export default defineComponent({
       changeLineColorAndTypeName,
       addTrain,
       LINE_COLORS,
+      buttonColorStyle,
     };
   },
 });
 </script>
+
+<style scoped>
+.trainIdButton {
+  max-width: fit-content;
+  min-width: 100%;
+}
+</style>
