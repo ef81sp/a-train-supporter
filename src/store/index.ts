@@ -1,5 +1,6 @@
 import {
   NecessaryTime,
+  NecessaryTimeMap,
   Station,
   StationList,
   TerminalStation,
@@ -135,9 +136,7 @@ const mockState = {
     // ],
   ]),
   diagramData: {
-    labels: [
-      // '上野', '北千住', '松戸', '柏'
-    ],
+    labels: ['上野', '北千住', '松戸', '柏'],
     datasets: [
       {
         label: '特急-1',
@@ -254,6 +253,26 @@ export default createStore<State>({
       state.stationList.startingStationName = stations[0].name;
       state.stationList.endingStationName = stations[stations.length - 1].name;
       state.__chartRefresh();
+    },
+    updateTrainTypeNecessaryTimeTable(
+      state,
+      {
+        trainTypeId,
+        boundFor,
+        newNecessaryTimeMap,
+      }: {
+        trainTypeId: number;
+        boundFor: 'A' | 'B';
+        newNecessaryTimeMap: NecessaryTimeMap;
+      }
+    ) {
+      const target = state.trainTypes.get(trainTypeId);
+      if (!target) return;
+      if (boundFor === 'A') {
+        target.necessaryTimesA = newNecessaryTimeMap;
+      } else {
+        target.necessaryTimesB = newNecessaryTimeMap;
+      }
     },
     updateDiagramData(
       state,
@@ -399,6 +418,10 @@ export default createStore<State>({
       context.commit('updateTrainType', payload);
       context.commit('__updateLineColorAndTrainName', payload.id);
       context.state.__chartRefresh();
+      context.commit('__logHistory');
+    },
+    updateTrainTypeNecessaryTimeTable(context, payload) {
+      context.commit('updateTrainTypeNecessaryTimeTable', payload);
       context.commit('__logHistory');
     },
     updateDiagramData(context, payload: { id: number; data: DiagramData[] }) {

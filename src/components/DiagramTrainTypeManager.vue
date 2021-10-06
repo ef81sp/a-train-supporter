@@ -64,12 +64,14 @@
       </Button>
     </div>
     <DiagramTrainTypeNecessaryTimeTable
-      headerText="A線"
-      :necessaryTime="trainType?.necessaryTimesA"
+      :trainTypeId="trainTypeId"
+      :necessaryTimeMap="trainType?.necessaryTimesA"
+      boundFor="A"
     />
     <DiagramTrainTypeNecessaryTimeTable
-      headerText="B線"
-      :necessaryTime="trainType?.necessaryTimesB"
+      :trainTypeId="trainTypeId"
+      :necessaryTimeMap="trainType?.necessaryTimesB"
+      boundFor="B"
     />
   </Panel>
 </template>

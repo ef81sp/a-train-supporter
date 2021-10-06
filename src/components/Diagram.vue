@@ -16,7 +16,7 @@
         />
       </Panel>
 
-      <Panel header="種別" class="my-2">
+      <Panel header="種別と所要時間" class="my-2">
         <template #icons>
           <Button
             class="p-button-sm"
