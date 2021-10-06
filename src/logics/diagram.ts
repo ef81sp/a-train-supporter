@@ -1,10 +1,11 @@
-import { DATE_FORMAT } from '@/common/const';
+import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
 import {
   NecessaryTime,
   NecessaryTimeMap,
   StationList,
   TerminalStation,
   TrainType,
+  TrainTypeMap,
 } from '@/types';
 import { DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
@@ -169,14 +170,10 @@ export const generateInitialNecessaryTime = (
   return result;
 };
 
-export const getRandomLineColor = () => {
-  const selection = [
-    '#842e36', // ワインレッド
-    '#c16b49', // オレンジバーミリオン
-    '#8fb871', // うぐいす
-    '#008d79', // エメラルドグリーン
-    '#0c3f71', // ブライトブルー
-    '#008aa2', // スカイブルー
-  ];
-  return selection[Math.floor(Math.random() * selection.length)];
+export const getRandomLineColor = (trainTypes: TrainTypeMap) => {
+  const usedColors = [...trainTypes.values()].map(
+    (trainType) => trainType.lineColor
+  );
+  const colors = LINE_COLORS.filter((v) => !usedColors.includes(v.value));
+  return colors[Math.floor(Math.random() * colors.length)];
 };

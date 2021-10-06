@@ -1,7 +1,47 @@
 <template>
-  <Panel :header="trainType?.name">
+  <Panel class="min-w-max">
+    <template #header>
+      <div class="flex align-content-center h-2rem">
+        <Inplace
+          :closable="true"
+          class="flex align-items-stretch"
+          @close="changeLineColorAndTypeName"
+        >
+          <template #display>
+            <span :style="{ color: trainType?.lineColor }">■</span>
+            <span class="font-bold">
+              {{ trainType?.name || "種別名" }}
+            </span>
+          </template>
+          <template #content>
+            <Dropdown
+              :options="LINE_COLORS"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="線の色"
+              v-model="lineColor"
+              class="w-5rem"
+            >
+              <template #value="slotProps">
+                <template v-if="slotProps.value">
+                  <span :style="{ color: slotProps.value }">■</span>
+                </template>
+                <template v-else>
+                  {{ slotProps.placeholder }}
+                </template>
+              </template>
+              <template #option="slotProps">
+                <span :style="{ color: slotProps.option.value }">■</span>
+                {{ slotProps.option.label }}
+              </template>
+            </Dropdown>
+            <InputText v-model="typeName" placeholder="種別" class="w-5rem" />
+          </template>
+        </Inplace>
+      </div>
+    </template>
     <template #icons>
-      <Button class="p-button-sm m-0" @click="addTrain"> 1編成ふやす </Button>
+      <Button class="p-button-sm m-0" @click="addTrain"> 編成+ </Button>
     </template>
     <div v-if="trainType">
       <Button
@@ -25,8 +65,10 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useStore } from "@/store";
+import { LINE_COLORS } from "@/common/const";
+import clonedeep from "lodash.clonedeep";
 
 import DiagramTrainTypeNecessaryTimeTable from "./DiagramTrainTypeNecessaryTimeTable.vue";
 
@@ -48,11 +90,37 @@ export default defineComponent({
       store.commit("setShowingTrainId", id);
     };
 
+    const lineColor = ref<string>(trainType.value?.lineColor || "");
+    const typeName = ref<string>(trainType.value?.name || "");
+    const changeLineColorAndTypeName = (e: {
+      originalEvent: Event;
+      value: string;
+    }) => {
+      if (!trainType.value) return;
+      if (
+        trainType.value.lineColor === e.value &&
+        trainType.value.name === typeName.value
+      )
+        return;
+      const newTrainType = clonedeep(trainType.value);
+      newTrainType.lineColor = lineColor.value;
+      newTrainType.name = typeName.value;
+
+      store.dispatch("updateTrainType", {
+        id: props.trainTypeId,
+        data: newTrainType,
+      });
+    };
+
     const addTrain = () => store.dispatch("addTrain", trainType.value?.id);
     return {
       trainType,
+      lineColor,
+      typeName,
       changeTrainId,
+      changeLineColorAndTypeName,
       addTrain,
+      LINE_COLORS,
     };
   },
 });

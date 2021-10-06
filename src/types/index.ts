@@ -35,6 +35,8 @@ export interface TrainType {
   lineColor: string;
 }
 
+export type TrainTypeMap = Map<number, TrainType>
+
 export interface TerminalStation {
   startingStationName: string;
   endingStationName: string;

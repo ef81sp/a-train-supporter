@@ -4,13 +4,14 @@ import {
   StationList,
   TerminalStation,
   TrainType,
+  TrainTypeMap,
 } from '@/types';
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
 import { chartJsData, chartJsDataSet, DiagramData } from '@/types/diagram';
 import { max } from 'date-fns';
 import dayjs from 'dayjs';
-import { DATE_FORMAT } from '@/common/const';
+import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
 import clonedeep from 'lodash.clonedeep';
 import {
   generateInitialNecessaryTime,
@@ -19,7 +20,7 @@ import {
 
 export interface State {
   stationList: StationList;
-  trainTypes: Map<number, TrainType>;
+  trainTypes: TrainTypeMap;
   diagramData: chartJsData;
   showingTrainId: number;
   nextTrainId: number;
@@ -116,7 +117,7 @@ const mockState = {
         ]),
         stoppingStationList: ['上野', '松戸', '柏'],
         trainIdList: [1],
-        lineColor: '#FF2222',
+        lineColor: LINE_COLORS[0].value,
       },
     ],
     // [
@@ -148,7 +149,7 @@ const mockState = {
           { time: '2021-10-14 05:05', station: '松戸' },
           { time: '2021-10-14 05:22', station: '上野' },
         ],
-        borderColor: '#FF2222',
+        borderColor: LINE_COLORS[0].value,
       },
     ],
   },
@@ -274,9 +275,22 @@ export default createStore<State>({
         stoppingStationList: state.stationList.stations.map((v) => v.name),
         necessaryTimesA: generateInitialNecessaryTime(state.stationList, 'A'),
         necessaryTimesB: generateInitialNecessaryTime(state.stationList, 'B'),
-        lineColor: getRandomLineColor(),
+        lineColor: getRandomLineColor(state.trainTypes).value,
       };
       state.trainTypes.set(newKey, newTrainType);
+    },
+    updateTrainType(state, { id, data }: { id: number; data: TrainType }) {
+      state.trainTypes.set(id, data);
+    },
+    __updateLineColorAndTrainName(state, trainTypeId: number) {
+      const trainType = state.trainTypes.get(trainTypeId);
+      if (!trainType) return;
+      let trainTypeNo = 1;
+      for (const dataset of state.diagramData.datasets) {
+        if (!trainType.trainIdList.includes(dataset.id)) continue;
+        dataset.borderColor = trainType.lineColor;
+        dataset.label = `${trainType.name}-${trainTypeNo++}`;
+      }
     },
     addTrain(
       state,
@@ -362,6 +376,12 @@ export default createStore<State>({
       const newTrainTypeId = Math.max(...context.state.trainTypes.keys());
       context.dispatch('addTrain', newTrainTypeId);
       // context.commit('__logHistory'); // addTrain側でやるので省略
+    },
+    updateTrainType(context, payload: { id: number; data: TrainType }) {
+      context.commit('updateTrainType', payload);
+      context.commit('__updateLineColorAndTrainName', payload.id);
+      context.state.__chartRefresh();
+      context.commit('__logHistory');
     },
     updateDiagramData(context, payload: { id: number; data: DiagramData[] }) {
       context.commit('updateDiagramData', payload);
