@@ -18,6 +18,8 @@
           id="startStation"
           v-model="startStation"
           :options="stationList"
+          optionLabel="name"
+          optionValue="id"
           class="w-10 text-left"
         />
       </div>
@@ -33,6 +35,8 @@
           id="endStation"
           v-model="endStation"
           :options="stationList"
+          optionLabel="name"
+          optionValue="id"
           class="w-10 text-left"
         />
       </div>
@@ -86,7 +90,11 @@
       scrollHeight="50vh"
       class="p-datatable-sm"
     >
-      <Column field="station" header="駅" />
+      <Column field="station" header="駅">
+        <template #body="slotProps">
+          {{ getStationName(slotProps.data.stationId) }}
+        </template>
+      </Column>
       <Column field="time" header="時刻">
         <template #body="slotProps">
           {{ formatDdHhmmToHhmm(slotProps.data.time) }}
@@ -107,6 +115,7 @@ import {
 import dayjs from "dayjs";
 import { useStore } from "@/store";
 import { DATE_FORMAT } from "@/common/const";
+import { Station, stationId } from "@/types";
 export default defineComponent({
   props: {
     diagramDataSetId: { type: Number, default: undefined },
@@ -120,9 +129,11 @@ export default defineComponent({
     const store = useStore();
 
     const stationList = computed(
-      () => store.getters.getShouldRecordTimeStationNameList
+      () => store.getters.getShouldRecordTimeStationList
     );
-
+    const getStationName = computed(
+      () => (id: stationId) => store.getters.getStation(id)?.name
+    );
     const trainType = computed(() =>
       store.getters.getTrainTypeByTrainId(props.diagramDataSetId || 0)
     );
@@ -139,15 +150,15 @@ export default defineComponent({
       return store.getters.getTrainDiagramDataSetById(props.diagramDataSetId);
     });
 
-    const startStation = ref<string>(
+    const startStation = ref<stationId>(
       selectedDiagramDataSet.value?.data.length
         ? selectedDiagramDataSet.value.data[
             selectedDiagramDataSet.value.data.length - 1
-          ].station
-        : stationList.value[0]
+          ].stationId
+        : stationList.value[0].id
     );
-    const endStation = ref<string>(
-      stationList.value[stationList.value.length - 1]
+    const endStation = ref<stationId>(
+      stationList.value[stationList.value.length - 1].id
     );
 
     const latestDataOnTheList = computed(() =>
@@ -176,8 +187,8 @@ export default defineComponent({
         roundMinute(newData.time, turnCycleTime.value),
         DATE_FORMAT
       ).toDate();
-      startStation.value = newData.station;
-      endStation.value = newData.station;
+      startStation.value = newData.stationId;
+      endStation.value = newData.stationId;
     });
     watch(turnCycleTime, (newCycleTime) => {
       if (!newCycleTime) return;
@@ -219,6 +230,7 @@ export default defineComponent({
       startStation,
       endStation,
       stationList,
+      getStationName,
       trainType,
       buttonColorStyle,
       boundFor,

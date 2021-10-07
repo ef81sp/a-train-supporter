@@ -79,7 +79,7 @@ export default defineComponent({
       aspectRatio: matchMedia("(max-width: 640px)").matches ? 2 : 3,
       parsing: {
         xAxisKey: "time",
-        yAxisKey: "station",
+        yAxisKey: "name",
       },
       indexAxis: "y",
       showLine: true,
@@ -128,7 +128,7 @@ export default defineComponent({
     const ltdExp = computed(() => store.getters.getTrainType(1));
     const trainTypes = computed(() => store.state.trainTypes);
 
-    const data = computed(() => store.state.diagramData);
+    const data = computed(() => store.getters.getChatrJsData);
 
     const showingTrainId = computed(() => store.state.showingTrainId);
 

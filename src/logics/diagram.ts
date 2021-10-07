@@ -2,6 +2,7 @@ import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
 import {
   NecessaryTime,
   NecessaryTimeMap,
+  stationId,
   StationList,
   TerminalStation,
   TrainType,
@@ -46,14 +47,14 @@ export const generateChartData = ({
 }: {
   startTime: string;
   trainType: TrainType;
-  startStation: string;
-  endStation: string;
+  startStation: stationId;
+  endStation: stationId;
   turnCycleTime?: number;
   boundFor: 'A' | 'B' | 'AB' | 'BA';
   terminalStation: TerminalStation;
 }) => {
   let currentTime: string = startTime;
-  const result: DiagramData[] = [{ station: startStation, time: startTime }];
+  const result: DiagramData[] = [{ stationId: startStation, time: startTime }];
   enum ROUND_TRIP_STATUS {
     ONE_WAY,
     ROUND_TRIP_OUTWARD,
@@ -79,31 +80,31 @@ export const generateChartData = ({
       // 復路の最初の駅は指定された待機時間ぶん追加する
       if (
         roundTripStatus === ROUND_TRIP_STATUS.ROUND_TRIP_HOMEWORD &&
-        (necessaryTime.from === terminalStation.endingStationName ||
-          necessaryTime.from === terminalStation.startingStationName)
+        (necessaryTime.from === terminalStation.endingStationId ||
+          necessaryTime.from === terminalStation.startingStationId)
       ) {
         currentTime = roundMinute(currentTime, turnCycleTime);
-        result.push({ station: necessaryTime.from, time: currentTime });
+        result.push({ stationId: necessaryTime.from, time: currentTime });
       }
 
       // 追加
       currentTime = addMinute(currentTime, necessaryTime.necessaryTime);
-      result.push({ station: necessaryTime.to, time: currentTime });
+      result.push({ stationId: necessaryTime.to, time: currentTime });
 
       // 終点の場合抜ける
       if (
         // 往路でendStationについても抜けない
         (roundTripStatus !== ROUND_TRIP_STATUS.ROUND_TRIP_OUTWARD &&
           necessaryTime.to === endStation) ||
-        necessaryTime.to === terminalStation.endingStationName ||
-        necessaryTime.to === terminalStation.startingStationName
+        necessaryTime.to === terminalStation.endingStationId ||
+        necessaryTime.to === terminalStation.startingStationId
       )
         return;
 
       // 停車駅の場合は1分追加する
       if (trainType.stoppingStationList.includes(necessaryTime.to)) {
         currentTime = addMinute(currentTime, 1);
-        result.push({ station: necessaryTime.to, time: currentTime });
+        result.push({ stationId: necessaryTime.to, time: currentTime });
       }
     }
   };
@@ -153,19 +154,19 @@ export const generateInitialNecessaryTime = (
   if (boundFor === 'B') {
     list.reverse();
   }
-  let previousStationName = list[0].name;
+  let previousStationId: stationId = list[0].id;
   list.forEach((station, idx) => {
     if (idx === 0) return;
     if (!station.shouldRecordTime) return;
-    const id = `${previousStationName}-${station.name}`;
+    const id = `${previousStationId}-${station.id}`;
     const item: NecessaryTime = {
       id,
-      from: previousStationName,
-      to: station.name,
+      from: previousStationId,
+      to: station.id,
       necessaryTime: 0,
     };
     result.set(id, item);
-    previousStationName = station.name;
+    previousStationId = station.id;
   });
   return result;
 };

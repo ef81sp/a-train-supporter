@@ -1,6 +1,9 @@
+import { stationId } from '@/types';
+
 export interface DiagramData {
   time: string;
-  station: string;
+  stationId: stationId;
+  name?: string;
 }
 
 export interface chartJsDataSet {

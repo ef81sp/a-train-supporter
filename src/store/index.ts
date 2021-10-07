@@ -2,6 +2,7 @@ import {
   NecessaryTime,
   NecessaryTimeMap,
   Station,
+  stationId,
   StationList,
   TerminalStation,
   TrainType,
@@ -31,11 +32,12 @@ export interface State {
 
 export interface Getters {
   getStationNameList: string[];
-  getShouldRecordTimeStationNameList: string[];
+  getShouldRecordTimeStationList: Station[];
   getTerminalStation: TerminalStation;
+  getStation: (key: stationId) => Station | undefined;
   getTrainType: (key: number) => TrainType | undefined;
   getTrainTypeByTrainId: (key: number) => TrainType | undefined;
-  getDiagramData: chartJsData;
+  getChatrJsData: chartJsData;
   getMinAndMaxTimeOnDiagramData: { min: string; max: string };
   getTrainDiagramDataSetById: (id: number) => chartJsDataSet | undefined;
   getHistoryInfo: { nowIndex: number; length: number };
@@ -64,8 +66,8 @@ export const key: InjectionKey<Store<State>> = Symbol();
 const initialState: State = {
   stationList: {
     stations: [],
-    startingStationName: '',
-    endingStationName: '',
+    startingStationId: 0,
+    endingStationId: 0,
   },
   trainTypes: new Map<number, TrainType>([]),
   diagramData: {
@@ -77,19 +79,19 @@ const initialState: State = {
   __chartRefresh: () => void 0,
 };
 
-const mockState = {
+const mockState: State = {
   stationList: {
     stations: [
-      { name: '上野', shouldRecordTime: true },
-      { name: '日暮里', shouldRecordTime: false },
-      { name: '三河島', shouldRecordTime: false },
-      { name: '南千住', shouldRecordTime: false },
-      { name: '北千住', shouldRecordTime: true },
-      { name: '松戸', shouldRecordTime: true },
-      { name: '柏', shouldRecordTime: true },
+      { id: 1, name: '上野', shouldRecordTime: true },
+      { id: 2, name: '日暮里', shouldRecordTime: false },
+      { id: 3, name: '三河島', shouldRecordTime: false },
+      { id: 4, name: '南千住', shouldRecordTime: false },
+      { id: 5, name: '北千住', shouldRecordTime: true },
+      { id: 6, name: '松戸', shouldRecordTime: true },
+      { id: 7, name: '柏', shouldRecordTime: true },
     ],
-    startingStationName: '上野',
-    endingStationName: '柏',
+    startingStationId: 1,
+    endingStationId: 7,
   },
   trainTypes: new Map<number, TrainType>([
     [
@@ -98,26 +100,14 @@ const mockState = {
         id: 1,
         name: '特急',
         necessaryTimesA: new Map<string, NecessaryTime>([
-          [
-            '上野-松戸',
-            { from: '上野', to: '松戸', necessaryTime: 17, id: '上野-松戸' },
-          ],
-          [
-            '松戸-柏',
-            { from: '松戸', to: '柏', necessaryTime: 4, id: '松戸-柏' },
-          ],
+          ['1-6', { from: 1, to: 6, necessaryTime: 17, id: '1-6' }],
+          ['6-7', { from: 6, to: 7, necessaryTime: 4, id: '6-7' }],
         ]),
         necessaryTimesB: new Map<string, NecessaryTime>([
-          [
-            '柏-松戸',
-            { from: '柏', to: '松戸', necessaryTime: 4, id: '柏-松戸' },
-          ],
-          [
-            '松戸-上野',
-            { from: '松戸', to: '上野', necessaryTime: 17, id: '松戸-上野' },
-          ],
+          ['7-6', { from: 7, to: 6, necessaryTime: 4, id: '7-6' }],
+          ['6-1', { from: 6, to: 1, necessaryTime: 17, id: '6-1' }],
         ]),
-        stoppingStationList: ['上野', '松戸', '柏'],
+        stoppingStationList: [1, 6, 7],
         trainIdList: [1],
         lineColor: LINE_COLORS[0].value,
       },
@@ -142,12 +132,12 @@ const mockState = {
         label: '特急-1',
         id: 1,
         data: [
-          { time: '2021-10-14 04:30', station: '上野' },
-          { time: '2021-10-14 04:47', station: '松戸' },
-          { time: '2021-10-14 04:51', station: '柏' },
-          { time: '2021-10-14 05:01', station: '柏' },
-          { time: '2021-10-14 05:05', station: '松戸' },
-          { time: '2021-10-14 05:22', station: '上野' },
+          { time: '2021-10-14 04:30', stationId: 1 },
+          { time: '2021-10-14 04:47', stationId: 6 },
+          { time: '2021-10-14 04:51', stationId: 7 },
+          { time: '2021-10-14 05:01', stationId: 7 },
+          { time: '2021-10-14 05:05', stationId: 6 },
+          { time: '2021-10-14 05:22', stationId: 1 },
         ],
         borderColor: LINE_COLORS[0].value,
       },
@@ -169,17 +159,18 @@ export default createStore<State>({
     getStationNameList({ stationList }): Getters['getStationNameList'] {
       return stationList.stations.map((v: Station) => v.name);
     },
-    getShouldRecordTimeStationNameList({
+    getStation({ stationList }): Getters['getStation'] {
+      return (id) => stationList.stations.find((v) => v.id === id);
+    },
+    getShouldRecordTimeStationList({
       stationList,
-    }): Getters['getShouldRecordTimeStationNameList'] {
-      return stationList.stations
-        .filter((v) => v.shouldRecordTime)
-        .map((v) => v.name);
+    }): Getters['getShouldRecordTimeStationList'] {
+      return stationList.stations.filter((v) => v.shouldRecordTime);
     },
     getTerminalStation({ stationList }): Getters['getTerminalStation'] {
       return {
-        startingStationName: stationList.startingStationName,
-        endingStationName: stationList.endingStationName,
+        startingStationId: stationList.startingStationId,
+        endingStationId: stationList.endingStationId,
       };
     },
     getTrainType({ trainTypes }): Getters['getTrainType'] {
@@ -189,8 +180,17 @@ export default createStore<State>({
       return (key: number) =>
         [...trainTypes.values()].find((v) => v.trainIdList.includes(key));
     },
-    getDiagramData({ diagramData }: State): Getters['getDiagramData'] {
-      return diagramData;
+    getChatrJsData(
+      { diagramData }: State,
+      getters: Getters
+    ): Getters['getChatrJsData'] {
+      const result: chartJsData = clonedeep(diagramData);
+      for (const dataset of result.datasets) {
+        for (const data of dataset.data) {
+          data.name = getters.getStation(data.stationId)?.name;
+        }
+      }
+      return result;
     },
     getMinAndMaxTimeOnDiagramData({
       diagramData,
@@ -250,8 +250,8 @@ export default createStore<State>({
         .filter((v) => v.shouldRecordTime)
         .map((v) => v.name);
       state.stationList.stations = stations;
-      state.stationList.startingStationName = stations[0].name;
-      state.stationList.endingStationName = stations[stations.length - 1].name;
+      state.stationList.startingStationId = stations[0].id;
+      state.stationList.endingStationId = stations[stations.length - 1].id;
       state.__chartRefresh();
     },
     updateTrainTypeNecessaryTimeTable(
@@ -302,7 +302,7 @@ export default createStore<State>({
         id: newKey,
         name: `種別${newKey}`,
         trainIdList: [],
-        stoppingStationList: state.stationList.stations.map((v) => v.name),
+        stoppingStationList: state.stationList.stations.map((v) => v.id),
         necessaryTimesA: generateInitialNecessaryTime(state.stationList, 'A'),
         necessaryTimesB: generateInitialNecessaryTime(state.stationList, 'B'),
         lineColor: getRandomLineColor(state.trainTypes).value,

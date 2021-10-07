@@ -5,21 +5,24 @@ export interface Rap {
   fromTo: string;
 }
 
+export type stationId = number;
+
 export interface Station {
+  id: stationId;
   name: string;
   shouldRecordTime: boolean;
 }
 
 export interface StationList {
   stations: Station[];
-  startingStationName: string;
-  endingStationName: string;
+  startingStationId: stationId;
+  endingStationId: stationId;
 }
 
 export interface NecessaryTime {
   id: string;
-  from: string;
-  to: string;
+  from: stationId;
+  to: stationId;
   necessaryTime: number;
 }
 
@@ -30,14 +33,14 @@ export interface TrainType {
   name: string;
   necessaryTimesA: NecessaryTimeMap;
   necessaryTimesB: NecessaryTimeMap;
-  stoppingStationList: string[];
+  stoppingStationList: stationId[];
   trainIdList: number[];
   lineColor: string;
 }
 
-export type TrainTypeMap = Map<number, TrainType>
+export type TrainTypeMap = Map<number, TrainType>;
 
 export interface TerminalStation {
-  startingStationName: string;
-  endingStationName: string;
+  startingStationId: stationId;
+  endingStationId: stationId;
 }

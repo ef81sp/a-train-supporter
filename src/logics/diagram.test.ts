@@ -2,8 +2,10 @@ import {
   NecessaryTime,
   NecessaryTimeMap,
   StationList,
+  TerminalStation,
   TrainType,
 } from '@/types';
+import { DiagramData } from '@/types/diagram';
 import {
   roundMinute,
   generateChartData,
@@ -42,29 +44,23 @@ describe('generateChartData', () => {
     id: 1,
     name: '特急',
     necessaryTimesA: new Map<string, NecessaryTime>([
-      [
-        '上野-松戸',
-        { from: '上野', to: '松戸', necessaryTime: 17, id: '上野-松戸' },
-      ],
-      ['松戸-柏', { from: '松戸', to: '柏', necessaryTime: 4, id: '松戸-柏' }],
-      ['柏-土浦', { from: '柏', to: '土浦', necessaryTime: 25, id: '柏-土浦' }],
+      ['1-6', { from: 1, to: 6, necessaryTime: 17, id: '1-6' }],
+      ['6-7', { from: 6, to: 7, necessaryTime: 4, id: '6-7' }],
+      ['7-8', { from: 7, to: 8, necessaryTime: 25, id: '7-8' }],
     ]),
     necessaryTimesB: new Map<string, NecessaryTime>([
-      ['土浦-柏', { from: '土浦', to: '柏', necessaryTime: 24, id: '土浦-柏' }],
-      ['柏-松戸', { from: '柏', to: '松戸', necessaryTime: 4, id: '柏-松戸' }],
-      [
-        '松戸-上野',
-        { from: '松戸', to: '上野', necessaryTime: 17, id: '松戸-上野' },
-      ],
+      ['8-7', { from: 8, to: 7, necessaryTime: 24, id: '8-7' }],
+      ['7-6', { from: 7, to: 6, necessaryTime: 4, id: '7-6' }],
+      ['6-1', { from: 6, to: 1, necessaryTime: 17, id: '6-1' }],
     ]),
-    stoppingStationList: ['上野', '柏', '土浦'],
+    stoppingStationList: [1, 7, 8],
     trainIdList: [],
     lineColor: '#000000',
   };
   const startTime = '2021-10-14 04:30';
-  const terminalStation = {
-    startingStationName: '上野',
-    endingStationName: '土浦',
+  const terminalStation: TerminalStation = {
+    startingStationId: 1,
+    endingStationId: 8,
   };
 
   describe('片道', () => {
@@ -73,16 +69,16 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '上野',
-        endStation: '土浦',
+        startStation: 1,
+        endStation: 8,
         boundFor: 'A',
       });
-      expect(result).toEqual([
-        { station: '上野', time: '2021-10-14 04:30' },
-        { station: '松戸', time: '2021-10-14 04:47' },
-        { station: '柏', time: '2021-10-14 04:51' },
-        { station: '柏', time: '2021-10-14 04:52' },
-        { station: '土浦', time: '2021-10-14 05:17' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 1, time: '2021-10-14 04:30' },
+        { stationId: 6, time: '2021-10-14 04:47' },
+        { stationId: 7, time: '2021-10-14 04:51' },
+        { stationId: 7, time: '2021-10-14 04:52' },
+        { stationId: 8, time: '2021-10-14 05:17' },
       ]);
     });
     it('全区間 - B', () => {
@@ -90,16 +86,16 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '土浦',
-        endStation: '上野',
+        startStation: 8,
+        endStation: 1,
         boundFor: 'B',
       });
-      expect(result).toEqual([
-        { station: '土浦', time: '2021-10-14 04:30' },
-        { station: '柏', time: '2021-10-14 04:54' },
-        { station: '柏', time: '2021-10-14 04:55' },
-        { station: '松戸', time: '2021-10-14 04:59' },
-        { station: '上野', time: '2021-10-14 05:16' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 8, time: '2021-10-14 04:30' },
+        { stationId: 7, time: '2021-10-14 04:54' },
+        { stationId: 7, time: '2021-10-14 04:55' },
+        { stationId: 6, time: '2021-10-14 04:59' },
+        { stationId: 1, time: '2021-10-14 05:16' },
       ]);
     });
     it('途中まで - A', () => {
@@ -107,14 +103,14 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '上野',
-        endStation: '柏',
+        startStation: 1,
+        endStation: 7,
         boundFor: 'A',
       });
-      expect(result).toEqual([
-        { station: '上野', time: '2021-10-14 04:30' },
-        { station: '松戸', time: '2021-10-14 04:47' },
-        { station: '柏', time: '2021-10-14 04:51' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 1, time: '2021-10-14 04:30' },
+        { stationId: 6, time: '2021-10-14 04:47' },
+        { stationId: 7, time: '2021-10-14 04:51' },
       ]);
     });
     it('途中まで - B', () => {
@@ -122,13 +118,13 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '土浦',
-        endStation: '柏',
+        startStation: 8,
+        endStation: 7,
         boundFor: 'B',
       });
-      expect(result).toEqual([
-        { station: '土浦', time: '2021-10-14 04:30' },
-        { station: '柏', time: '2021-10-14 04:54' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 8, time: '2021-10-14 04:30' },
+        { stationId: 7, time: '2021-10-14 04:54' },
       ]);
     });
     it('途中から- A', () => {
@@ -136,13 +132,13 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '柏',
-        endStation: '土浦',
+        startStation: 7,
+        endStation: 8,
         boundFor: 'A',
       });
-      expect(result).toEqual([
-        { station: '柏', time: '2021-10-14 04:30' },
-        { station: '土浦', time: '2021-10-14 04:55' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 7, time: '2021-10-14 04:30' },
+        { stationId: 8, time: '2021-10-14 04:55' },
       ]);
     });
     it('途中から - B', () => {
@@ -150,14 +146,14 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '柏',
-        endStation: '上野',
+        startStation: 7,
+        endStation: 1,
         boundFor: 'B',
       });
-      expect(result).toEqual([
-        { station: '柏', time: '2021-10-14 04:30' },
-        { station: '松戸', time: '2021-10-14 04:34' },
-        { station: '上野', time: '2021-10-14 04:51' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 7, time: '2021-10-14 04:30' },
+        { stationId: 6, time: '2021-10-14 04:34' },
+        { stationId: 1, time: '2021-10-14 04:51' },
       ]);
     });
   });
@@ -167,21 +163,21 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '上野',
-        endStation: '上野',
+        startStation: 1,
+        endStation: 1,
         boundFor: 'AB',
       });
       expect(result).toEqual([
-        { station: '上野', time: '2021-10-14 04:30' },
-        { station: '松戸', time: '2021-10-14 04:47' },
-        { station: '柏', time: '2021-10-14 04:51' },
-        { station: '柏', time: '2021-10-14 04:52' },
-        { station: '土浦', time: '2021-10-14 05:17' },
-        { station: '土浦', time: '2021-10-14 05:30' },
-        { station: '柏', time: '2021-10-14 05:54' },
-        { station: '柏', time: '2021-10-14 05:55' },
-        { station: '松戸', time: '2021-10-14 05:59' },
-        { station: '上野', time: '2021-10-14 06:16' },
+        { stationId: 1, time: '2021-10-14 04:30' },
+        { stationId: 6, time: '2021-10-14 04:47' },
+        { stationId: 7, time: '2021-10-14 04:51' },
+        { stationId: 7, time: '2021-10-14 04:52' },
+        { stationId: 8, time: '2021-10-14 05:17' },
+        { stationId: 8, time: '2021-10-14 05:30' },
+        { stationId: 7, time: '2021-10-14 05:54' },
+        { stationId: 7, time: '2021-10-14 05:55' },
+        { stationId: 6, time: '2021-10-14 05:59' },
+        { stationId: 1, time: '2021-10-14 06:16' },
       ]);
     });
     it('全区間 - BA', () => {
@@ -189,21 +185,21 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '土浦',
-        endStation: '土浦',
+        startStation: 8,
+        endStation: 8,
         boundFor: 'BA',
       });
-      expect(result).toEqual([
-        { station: '土浦', time: '2021-10-14 04:30' },
-        { station: '柏', time: '2021-10-14 04:54' },
-        { station: '柏', time: '2021-10-14 04:55' },
-        { station: '松戸', time: '2021-10-14 04:59' },
-        { station: '上野', time: '2021-10-14 05:16' },
-        { station: '上野', time: '2021-10-14 05:30' },
-        { station: '松戸', time: '2021-10-14 05:47' },
-        { station: '柏', time: '2021-10-14 05:51' },
-        { station: '柏', time: '2021-10-14 05:52' },
-        { station: '土浦', time: '2021-10-14 06:17' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 8, time: '2021-10-14 04:30' },
+        { stationId: 7, time: '2021-10-14 04:54' },
+        { stationId: 7, time: '2021-10-14 04:55' },
+        { stationId: 6, time: '2021-10-14 04:59' },
+        { stationId: 1, time: '2021-10-14 05:16' },
+        { stationId: 1, time: '2021-10-14 05:30' },
+        { stationId: 6, time: '2021-10-14 05:47' },
+        { stationId: 7, time: '2021-10-14 05:51' },
+        { stationId: 7, time: '2021-10-14 05:52' },
+        { stationId: 8, time: '2021-10-14 06:17' },
       ]);
     });
     it('端から途中まで - AB', () => {
@@ -211,18 +207,18 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '上野',
-        endStation: '柏',
+        startStation: 1,
+        endStation: 7,
         boundFor: 'AB',
       });
-      expect(result).toEqual([
-        { station: '上野', time: '2021-10-14 04:30' },
-        { station: '松戸', time: '2021-10-14 04:47' },
-        { station: '柏', time: '2021-10-14 04:51' },
-        { station: '柏', time: '2021-10-14 04:52' },
-        { station: '土浦', time: '2021-10-14 05:17' },
-        { station: '土浦', time: '2021-10-14 05:30' },
-        { station: '柏', time: '2021-10-14 05:54' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 1, time: '2021-10-14 04:30' },
+        { stationId: 6, time: '2021-10-14 04:47' },
+        { stationId: 7, time: '2021-10-14 04:51' },
+        { stationId: 7, time: '2021-10-14 04:52' },
+        { stationId: 8, time: '2021-10-14 05:17' },
+        { stationId: 8, time: '2021-10-14 05:30' },
+        { stationId: 7, time: '2021-10-14 05:54' },
       ]);
     });
     it('端から途中まで - BA', () => {
@@ -230,19 +226,19 @@ describe('generateChartData', () => {
         startTime,
         trainType,
         terminalStation,
-        startStation: '土浦',
-        endStation: '柏',
+        startStation: 8,
+        endStation: 7,
         boundFor: 'BA',
       });
-      expect(result).toEqual([
-        { station: '土浦', time: '2021-10-14 04:30' },
-        { station: '柏', time: '2021-10-14 04:54' },
-        { station: '柏', time: '2021-10-14 04:55' },
-        { station: '松戸', time: '2021-10-14 04:59' },
-        { station: '上野', time: '2021-10-14 05:16' },
-        { station: '上野', time: '2021-10-14 05:30' },
-        { station: '松戸', time: '2021-10-14 05:47' },
-        { station: '柏', time: '2021-10-14 05:51' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 8, time: '2021-10-14 04:30' },
+        { stationId: 7, time: '2021-10-14 04:54' },
+        { stationId: 7, time: '2021-10-14 04:55' },
+        { stationId: 6, time: '2021-10-14 04:59' },
+        { stationId: 1, time: '2021-10-14 05:16' },
+        { stationId: 1, time: '2021-10-14 05:30' },
+        { stationId: 6, time: '2021-10-14 05:47' },
+        { stationId: 7, time: '2021-10-14 05:51' },
       ]);
     });
     it('途中から端まで - AB', () => {
@@ -250,18 +246,18 @@ describe('generateChartData', () => {
         startTime: '2021-10-14 04:52',
         trainType,
         terminalStation,
-        startStation: '柏',
-        endStation: '上野',
+        startStation: 7,
+        endStation: 1,
         boundFor: 'AB',
       });
-      expect(result).toEqual([
-        { station: '柏', time: '2021-10-14 04:52' },
-        { station: '土浦', time: '2021-10-14 05:17' },
-        { station: '土浦', time: '2021-10-14 05:30' },
-        { station: '柏', time: '2021-10-14 05:54' },
-        { station: '柏', time: '2021-10-14 05:55' },
-        { station: '松戸', time: '2021-10-14 05:59' },
-        { station: '上野', time: '2021-10-14 06:16' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 7, time: '2021-10-14 04:52' },
+        { stationId: 8, time: '2021-10-14 05:17' },
+        { stationId: 8, time: '2021-10-14 05:30' },
+        { stationId: 7, time: '2021-10-14 05:54' },
+        { stationId: 7, time: '2021-10-14 05:55' },
+        { stationId: 6, time: '2021-10-14 05:59' },
+        { stationId: 1, time: '2021-10-14 06:16' },
       ]);
     });
     it('途中から端まで - BA', () => {
@@ -269,19 +265,19 @@ describe('generateChartData', () => {
         startTime: '2021-10-14 04:55',
         trainType,
         terminalStation,
-        startStation: '柏',
-        endStation: '土浦',
+        startStation: 7,
+        endStation: 8,
         boundFor: 'BA',
       });
-      expect(result).toEqual([
-        { station: '柏', time: '2021-10-14 04:55' },
-        { station: '松戸', time: '2021-10-14 04:59' },
-        { station: '上野', time: '2021-10-14 05:16' },
-        { station: '上野', time: '2021-10-14 05:30' },
-        { station: '松戸', time: '2021-10-14 05:47' },
-        { station: '柏', time: '2021-10-14 05:51' },
-        { station: '柏', time: '2021-10-14 05:52' },
-        { station: '土浦', time: '2021-10-14 06:17' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 7, time: '2021-10-14 04:55' },
+        { stationId: 6, time: '2021-10-14 04:59' },
+        { stationId: 1, time: '2021-10-14 05:16' },
+        { stationId: 1, time: '2021-10-14 05:30' },
+        { stationId: 6, time: '2021-10-14 05:47' },
+        { stationId: 7, time: '2021-10-14 05:51' },
+        { stationId: 7, time: '2021-10-14 05:52' },
+        { stationId: 8, time: '2021-10-14 06:17' },
       ]);
     });
     it('途中から途中まで - AB', () => {
@@ -289,15 +285,15 @@ describe('generateChartData', () => {
         startTime: '2021-10-14 04:52',
         trainType,
         terminalStation,
-        startStation: '柏',
-        endStation: '柏',
+        startStation: 7,
+        endStation: 7,
         boundFor: 'AB',
       });
-      expect(result).toEqual([
-        { station: '柏', time: '2021-10-14 04:52' },
-        { station: '土浦', time: '2021-10-14 05:17' },
-        { station: '土浦', time: '2021-10-14 05:30' },
-        { station: '柏', time: '2021-10-14 05:54' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 7, time: '2021-10-14 04:52' },
+        { stationId: 8, time: '2021-10-14 05:17' },
+        { stationId: 8, time: '2021-10-14 05:30' },
+        { stationId: 7, time: '2021-10-14 05:54' },
       ]);
     });
     it('途中から途中まで - BA', () => {
@@ -305,17 +301,17 @@ describe('generateChartData', () => {
         startTime: '2021-10-14 04:55',
         trainType,
         terminalStation,
-        startStation: '柏',
-        endStation: '柏',
+        startStation: 7,
+        endStation: 7,
         boundFor: 'BA',
       });
-      expect(result).toEqual([
-        { station: '柏', time: '2021-10-14 04:55' },
-        { station: '松戸', time: '2021-10-14 04:59' },
-        { station: '上野', time: '2021-10-14 05:16' },
-        { station: '上野', time: '2021-10-14 05:30' },
-        { station: '松戸', time: '2021-10-14 05:47' },
-        { station: '柏', time: '2021-10-14 05:51' },
+      expect(result).toEqual<DiagramData[]>([
+        { stationId: 7, time: '2021-10-14 04:55' },
+        { stationId: 6, time: '2021-10-14 04:59' },
+        { stationId: 1, time: '2021-10-14 05:16' },
+        { stationId: 1, time: '2021-10-14 05:30' },
+        { stationId: 6, time: '2021-10-14 05:47' },
+        { stationId: 7, time: '2021-10-14 05:51' },
       ]);
     });
   });
@@ -324,57 +320,39 @@ describe('generateChartData', () => {
 describe('generateInitialNecessaryTime', () => {
   const stationList: StationList = {
     stations: [
-      { name: '上野', shouldRecordTime: true },
-      { name: '日暮里', shouldRecordTime: false },
-      { name: '三河島', shouldRecordTime: true },
-      { name: '南千住', shouldRecordTime: false },
-      { name: '北千住', shouldRecordTime: true },
-      { name: '松戸', shouldRecordTime: false },
-      { name: '柏', shouldRecordTime: true },
+      { id: 1, name: '上野', shouldRecordTime: true },
+      { id: 2, name: '日暮里', shouldRecordTime: false },
+      { id: 3, name: '三河島', shouldRecordTime: true },
+      { id: 4, name: '南千住', shouldRecordTime: false },
+      { id: 5, name: '北千住', shouldRecordTime: true },
+      { id: 6, name: '松戸', shouldRecordTime: false },
+      { id: 7, name: '柏', shouldRecordTime: true },
     ],
-    startingStationName: '上野',
-    endingStationName: '柏',
+    startingStationId: 1,
+    endingStationId: 7,
   };
   const expectedNecessaryTimesA: NecessaryTimeMap = new Map<
     string,
     NecessaryTime
   >([
-    [
-      '上野-三河島',
-      { from: '上野', to: '三河島', necessaryTime: 0, id: '上野-三河島' },
-    ],
-    [
-      '三河島-北千住',
-      { from: '三河島', to: '北千住', necessaryTime: 0, id: '三河島-北千住' },
-    ],
-    [
-      '北千住-柏',
-      { from: '北千住', to: '柏', necessaryTime: 0, id: '北千住-柏' },
-    ],
+    ['1-3', { from: 1, to: 3, necessaryTime: 0, id: '1-3' }],
+    ['3-5', { from: 3, to: 5, necessaryTime: 0, id: '3-5' }],
+    ['5-7', { from: 5, to: 7, necessaryTime: 0, id: '5-7' }],
   ]);
   const expectedNecessaryTimesB: NecessaryTimeMap = new Map<
     string,
     NecessaryTime
   >([
-    [
-      '柏-北千住',
-      { from: '柏', to: '北千住', necessaryTime: 0, id: '柏-北千住' },
-    ],
-    [
-      '北千住-三河島',
-      { from: '北千住', to: '三河島', necessaryTime: 0, id: '北千住-三河島' },
-    ],
-    [
-      '三河島-上野',
-      { from: '三河島', to: '上野', necessaryTime: 0, id: '三河島-上野' },
-    ],
+    ['7-5', { from: 7, to: 5, necessaryTime: 0, id: '7-5' }],
+    ['5-3', { from: 5, to: 3, necessaryTime: 0, id: '5-3' }],
+    ['3-1', { from: 3, to: 1, necessaryTime: 0, id: '3-1' }],
   ]);
   it('bound for A', () => {
     const result = generateInitialNecessaryTime(stationList, 'A');
-    expect(result).toEqual(expectedNecessaryTimesA);
+    expect(result).toEqual<NecessaryTimeMap>(expectedNecessaryTimesA);
   });
   it('bound for B', () => {
     const result = generateInitialNecessaryTime(stationList, 'B');
-    expect(result).toEqual(expectedNecessaryTimesB);
+    expect(result).toEqual<NecessaryTimeMap>(expectedNecessaryTimesB);
   });
 });
