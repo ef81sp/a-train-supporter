@@ -20,11 +20,7 @@
     </Column>
     <Column field="necessaryTime" header="分" class="max-w-0">
       <template #editor="{ data, column }">
-        <InputNumber
-          :modelValue="data[column.props.field]"
-          class="w-3rem"
-          @input="(e) => onChangeCellValue(e, data.id)"
-        />
+        <InputNumber v-model="data[column.props.field]" class="w-3rem" />
       </template>
     </Column>
     <template #footer>
@@ -44,52 +40,32 @@ import { useStore } from "@/store";
 export default defineComponent({
   props: {
     trainTypeId: Number,
-    necessaryTimeMap: Object as PropType<NecessaryTimeMap>,
+    modelValue: Object as PropType<NecessaryTimeMap>,
     boundFor: String as PropType<"A" | "B">,
   },
-  setup(props) {
+  emits: ["update:modelValue"],
+  setup(props, context) {
     const necessaryTimeArray = computed(() => {
-      if (!props.necessaryTimeMap) return [];
-      return [...props.necessaryTimeMap.values()];
+      if (!props.modelValue) return [];
+      return [...props.modelValue.values()];
     });
     const store = useStore();
-    const necessaryTimeOnCell = ref({
-      id: "",
-      value: 0,
-    }); // Vuex由来の値をv-modelにあてるわけにはいかない
 
-    const stationList = computed(() => store.state.stationList);
     const getStationName = computed(
       () => (id: stationId) => store.getters.getStation(id)?.name
     );
     const onCellEditComplete = (
       e: Event & { data: NecessaryTime; field: string }
     ) => {
-      if (!props.necessaryTimeMap) return;
-
-      const newNecessaryTimeMap = clonedeep(props.necessaryTimeMap);
-      const target = newNecessaryTimeMap.get(e.data.id);
-      if (!target) return;
-      if (target.id !== necessaryTimeOnCell.value.id) return;
-      if (target.necessaryTime === necessaryTimeOnCell.value.value) return;
-
-      target.necessaryTime = necessaryTimeOnCell.value.value;
-      store.dispatch("updateTrainTypeNecessaryTimeTable", {
-        trainTypeId: props.trainTypeId,
-        boundFor: props.boundFor,
-        newNecessaryTimeMap,
-      });
-    };
-
-    const onChangeCellValue = (e: Event & { value: number }, id: string) => {
-      necessaryTimeOnCell.value.id = id;
-      necessaryTimeOnCell.value.value = e.value;
+      if (!props.modelValue) return;
+      const newNecessaryTimeMap = clonedeep(props.modelValue);
+      newNecessaryTimeMap.set(e.data.id, e.data);
+      context.emit("update:modelValue", newNecessaryTimeMap);
     };
 
     return {
       necessaryTimeArray,
       onCellEditComplete,
-      onChangeCellValue,
       getStationName,
     };
   },

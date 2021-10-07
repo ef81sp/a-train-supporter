@@ -65,12 +65,12 @@
     </div>
     <DiagramTrainTypeNecessaryTimeTable
       :trainTypeId="trainTypeId"
-      :necessaryTimeMap="trainType?.necessaryTimesA"
+      v-model="necessaryTimesA"
       boundFor="A"
     />
     <DiagramTrainTypeNecessaryTimeTable
       :trainTypeId="trainTypeId"
-      :necessaryTimeMap="trainType?.necessaryTimesB"
+      v-model="necessaryTimesB"
       boundFor="B"
     />
   </Panel>
@@ -97,6 +97,26 @@ export default defineComponent({
     const trainType = computed(() =>
       store.getters.getTrainType(props.trainTypeId || 0)
     );
+    const necessaryTimesA = computed({
+      get: () => trainType.value?.necessaryTimesA,
+      set: (value) => {
+        store.dispatch("updateTrainTypeNecessaryTimeTable", {
+          trainTypeId: props.trainTypeId,
+          boundFor: "A",
+          newNecessaryTimeMap: value,
+        });
+      },
+    });
+    const necessaryTimesB = computed({
+      get: () => trainType.value?.necessaryTimesB,
+      set: (value) => {
+        store.dispatch("updateTrainTypeNecessaryTimeTable", {
+          trainTypeId: props.trainTypeId,
+          boundFor: "B",
+          newNecessaryTimeMap: value,
+        });
+      },
+    });
 
     const changeTrainId = (id: number) => {
       store.commit("setShowingTrainId", id);
@@ -139,6 +159,8 @@ export default defineComponent({
       addTrain,
       LINE_COLORS,
       buttonColorStyle,
+      necessaryTimesA,
+      necessaryTimesB,
     };
   },
 });
