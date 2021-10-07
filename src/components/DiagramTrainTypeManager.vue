@@ -1,5 +1,5 @@
 <template>
-  <Panel class="min-w-max">
+  <Panel class="panel">
     <template #header>
       <div class="flex align-content-center h-2rem">
         <Inplace
@@ -148,5 +148,8 @@ export default defineComponent({
 .trainIdButton {
   max-width: fit-content;
   min-width: 100%;
+}
+.panel {
+  min-width: 15rem;
 }
 </style>

@@ -16,7 +16,7 @@
         />
       </Panel>
 
-      <Panel header="種別と所要時間" class="my-2">
+      <Panel header="種別と所要時間" class="my-1 time-table-manager-panel">
         <template #icons>
           <Button
             class="p-button-sm"
@@ -156,6 +156,8 @@ export default defineComponent({
 });
 </script>
 
-
-<style scoped>
+<style lang="css" scoped>
+::v-deep(.p-panel.time-table-manager-panel) .p-panel-content {
+  padding: 0 0.5rem;
+}
 </style>

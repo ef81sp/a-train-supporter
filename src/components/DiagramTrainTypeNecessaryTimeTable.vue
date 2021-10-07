@@ -1,16 +1,16 @@
 <template>
   <DataTable
     :value="necessaryTimeArray"
-    class="m-2 p-datatable-sm min-w-max"
+    class="my-1 p-datatable-sm min-w-max max-w-full"
     editMode="cell"
     @cell-edit-complete="onCellEditComplete"
   >
     <template #header>
       {{ `${boundFor}線` }}
     </template>
-    <Column field="from" header="発" class="w-5 min-w-max" />
-    <Column field="to" header="着" class="w-5 min-w-max" />
-    <Column field="necessaryTime" header="分" class="w-5 max-w-min">
+    <Column field="from" header="発" class="w-4 max-w-0" />
+    <Column field="to" header="着" class="w-4 max-w-0" />
+    <Column field="necessaryTime" header="分" class="max-w-0">
       <template #editor="{ data, column }">
         <InputNumber
           :modelValue="data[column.props.field]"
