@@ -41,13 +41,16 @@
       </div>
     </template>
     <template #icons>
-      <Button
-        class="p-button-sm m-0"
+      <SplitButton
+        label="編成+"
+        class="p-button-sm p-button-secondary split-button"
         @click="addTrain"
-        :style="buttonColorStyle"
-      >
-        編成+
-      </Button>
+        :model="splitButtonItems"
+      />
+      <DiagramTrainTypeManagerStopStationManager
+        v-model:visible="isVisibleStopStationManagerModal"
+        v-model:trainType="trainType"
+      />
     </template>
     <div
       v-if="trainType"
@@ -84,6 +87,7 @@ import rfdc from "rfdc";
 const clonedeep = rfdc();
 
 import DiagramTrainTypeNecessaryTimeTable from "./DiagramTrainTypeNecessaryTimeTable.vue";
+import DiagramTrainTypeManagerStopStationManager from "./DiagramTrainTypeManagerStopStationManager.vue";
 
 export default defineComponent({
   props: {
@@ -91,13 +95,21 @@ export default defineComponent({
   },
   components: {
     DiagramTrainTypeNecessaryTimeTable,
+    DiagramTrainTypeManagerStopStationManager,
   },
   setup(props) {
     const store = useStore();
 
-    const trainType = computed(() =>
-      store.getters.getTrainType(props.trainTypeId || 0)
-    );
+    const trainType = computed({
+      get: () => store.getters.getTrainType(props.trainTypeId || 0),
+      set: (value) => {
+        console.log("here");
+        store.dispatch("updateTrainType", {
+          id: props.trainTypeId,
+          data: value,
+        });
+      },
+    });
     const necessaryTimesA = computed({
       get: () => trainType.value?.necessaryTimesA,
       set: (value) => {
@@ -150,7 +162,15 @@ export default defineComponent({
       borderColor: lineColor.value,
     }));
 
+    const isVisibleStopStationManagerModal = ref<boolean>(false);
+
     const addTrain = () => store.dispatch("addTrain", trainType.value?.id);
+    const editStopStation = () => {
+      isVisibleStopStationManagerModal.value = true;
+    };
+    const splitButtonItems = ref([
+      { label: "停車駅編集", icon: "pi pi-list", command: editStopStation },
+    ]);
     return {
       trainType,
       lineColor,
@@ -162,6 +182,8 @@ export default defineComponent({
       buttonColorStyle,
       necessaryTimesA,
       necessaryTimesB,
+      splitButtonItems,
+      isVisibleStopStationManagerModal,
     };
   },
 });
@@ -174,5 +196,9 @@ export default defineComponent({
 }
 .panel {
   min-width: 15rem;
+}
+::v-deep(.split-button) .p-button {
+  font-size: 0.9em;
+  padding: 0.5rem 0.3rem;
 }
 </style>

@@ -10,6 +10,7 @@ import VuexUndoRedo from 'vuex-undo-redo';
 import PrimeVue from 'primevue/config';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
+import SplitButton from 'primevue/splitbutton';
 import Card from 'primevue/card';
 import Chart from 'primevue/chart';
 import DataTable from 'primevue/datatable';
@@ -23,6 +24,7 @@ import RadioButton from 'primevue/radiobutton';
 import Timeline from 'primevue/timeline';
 import Checkbox from 'primevue/checkbox';
 import Inplace from 'primevue/inplace';
+import Dialog from 'primevue/dialog';
 
 import 'primevue/resources/themes/saga-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -41,7 +43,9 @@ createApp(App)
   .use(router)
   .use(PrimeVue)
   .component('Dropdown', Dropdown)
+  .component('SplitButton', SplitButton)
   .component('Button', Button)
+  .component('RadioButton', RadioButton)
   .component('Card', Card)
   .component('Chart', Chart)
   .component('DataTable', DataTable)
@@ -51,9 +55,9 @@ createApp(App)
   .component('Calendar', Calendar)
   .component('InputNumber', InputNumber)
   .component('InputText', InputText)
-  .component('RadioButton', RadioButton)
   .component('Timeline', Timeline)
   .component('Checkbox', Checkbox)
   .component('Inplace', Inplace)
+  .component('Dialog', Dialog)
 
   .mount('#app');
