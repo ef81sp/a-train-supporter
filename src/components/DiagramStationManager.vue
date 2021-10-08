@@ -3,7 +3,7 @@
     <InputText
       placeholder="駅名"
       v-model="newStationName"
-      @keydown.enter="onEnter($event.keyCode)"
+      @keydown.enter="onEnter($event.keyCode, addStation)"
     />
     <Button icon="pi pi-plus" @click="addStation" label="駅追加" />
   </div>
@@ -19,9 +19,30 @@
           />
         </template>
         <template #content="slotProps">
-          <p class="vertical-rl">
-            {{ slotProps.item.name }}
-          </p>
+          <div class="vertical-rl h-5rem">
+            <Inplace
+              :closable="true"
+              @close="() => changeStationName(slotProps.index)"
+              v-model:active="isOpenStationNameChange[slotProps.index]"
+              class="block"
+            >
+              <template #display>
+                {{ slotProps.item.name }}
+              </template>
+              <template #content>
+                <InputText
+                  :modelValue="slotProps.item.name"
+                  class="w-6rem"
+                  @input="onChangeStationName"
+                  @keydown.enter="
+                    onEnter($event.keyCode, () =>
+                      changeStationName(slotProps.index)
+                    )
+                  "
+                />
+              </template>
+            </Inplace>
+          </div>
         </template>
       </Timeline>
     </template>
@@ -37,7 +58,7 @@
 
 <script lang="ts">
 import { useStore } from "@/store";
-import { Station, StationList } from "@/types";
+import { Station } from "@/types";
 import { computed, defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -69,8 +90,28 @@ export default defineComponent({
       store.dispatch("updateStationList", newList);
     };
 
-    const onEnter = (keyCode: number) => {
-      if (keyCode === 13) addStation();
+    const isOpenStationNameChange = ref<boolean[]>([]);
+    const changingStationName = ref("");
+    const onChangeStationName = (e: { target: HTMLInputElement }) => {
+      changingStationName.value = e.target.value;
+    };
+    const changeStationName = (stationListIndex: number) => {
+      const newList: Station[] = stationList.value.stations.map((v, idx) => {
+        return {
+          id: v.id,
+          name:
+            idx === stationListIndex
+              ? changingStationName.value || v.name || String(idx)
+              : v.name,
+          shouldRecordTime: v.shouldRecordTime,
+        };
+      });
+      store.dispatch("updateStationList", newList);
+      isOpenStationNameChange.value[stationListIndex] = false;
+    };
+
+    const onEnter = (keyCode: number, cb: () => void) => {
+      if (keyCode === 13) cb();
     };
 
     return {
@@ -79,6 +120,9 @@ export default defineComponent({
       addStation,
       onEnter,
       changeCheckbox,
+      isOpenStationNameChange,
+      changeStationName,
+      onChangeStationName,
     };
   },
 });
@@ -95,5 +139,6 @@ export default defineComponent({
 .station-chart {
   padding: 0 1rem;
   overflow-x: scroll;
+  height: fit-content;
 }
 </style>
