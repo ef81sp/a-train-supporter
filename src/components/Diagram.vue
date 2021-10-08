@@ -72,9 +72,7 @@ export default defineComponent({
     const chartRef = ref<Chart>();
     const graphOptions = computed(() => ({
       tension: 0,
-      animation: {
-        duration: 50,
-      },
+      animation: false,
       responsive: true,
       aspectRatio: matchMedia("(max-width: 640px)").matches ? 2 : 3,
       parsing: {
