@@ -15,6 +15,7 @@ import { max } from 'date-fns';
 import dayjs from 'dayjs';
 import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
 import clonedeep from 'lodash.clonedeep';
+import equal from 'fast-deep-equal/es6';
 import {
   generateInitialNecessaryTime,
   getRandomLineColor,
@@ -355,6 +356,9 @@ export default createStore<State>({
       const copiedState = clonedeep(state);
       delete copiedState.__history;
       if (!state.__history) return;
+      if (equal(state.__history.stack[state.__history.nowIndex], copiedState)) {
+        return;
+      }
       state.__history.stack = state.__history.stack.slice(
         0,
         state.__history.nowIndex + 1
