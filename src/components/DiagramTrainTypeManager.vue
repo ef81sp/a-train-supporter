@@ -80,7 +80,8 @@
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "@/store";
 import { LINE_COLORS } from "@/common/const";
-import clonedeep from "lodash.clonedeep";
+import rfdc from "rfdc";
+const clonedeep = rfdc();
 
 import DiagramTrainTypeNecessaryTimeTable from "./DiagramTrainTypeNecessaryTimeTable.vue";
 

@@ -13,12 +13,14 @@ import { InjectionKey } from 'vue';
 import { chartJsData, chartJsDataSet, DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
 import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
-import clonedeep from 'lodash.clonedeep';
+import rfdc from 'rfdc';
 import equal from 'fast-deep-equal/es6';
 import {
   generateInitialNecessaryTime,
   getRandomLineColor,
 } from '@/logics/diagram';
+
+const clonedeep = rfdc()
 
 export interface State {
   stationList: StationList;

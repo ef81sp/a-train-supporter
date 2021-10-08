@@ -34,8 +34,10 @@
 <script lang="ts">
 import { NecessaryTime, NecessaryTimeMap, stationId } from "@/types";
 import { computed, defineComponent, PropType, ref } from "vue";
-import clonedeep from "lodash.clonedeep";
+import rfdc from "rfdc";
 import { useStore } from "@/store";
+
+const clonedeep = rfdc();
 
 export default defineComponent({
   props: {

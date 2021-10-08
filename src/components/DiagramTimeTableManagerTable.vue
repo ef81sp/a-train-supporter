@@ -26,10 +26,12 @@
 import DiagramTimeTableManagerTimeEditor from "@/components/DiagramTimeTableManagerTimeEditor.vue";
 import { DiagramData } from "@/types/diagram";
 import { computed, defineComponent, PropType, ref, watch } from "vue";
-import clonedeep from "lodash.clonedeep";
 import { useStore } from "@/store";
 import { stationId } from "@/types";
 import { formatDdHhmmToHhmm } from "@/logics/diagram";
+import rfdc from "rfdc";
+
+const clonedeep = rfdc();
 
 export default defineComponent({
   components: {

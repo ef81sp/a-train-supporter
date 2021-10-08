@@ -10,7 +10,9 @@ import {
 } from '@/types';
 import { DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
-import clonedeep from 'lodash.clonedeep';
+import rfdc from 'rfdc';
+
+const clonedeep = rfdc();
 
 export const formatDdHhmmToHhmm = (time: string) => {
   return dayjs(time, DATE_FORMAT).format('HH:mm');
