@@ -88,6 +88,11 @@ export default defineComponent({
           },
         },
       },
+      elements: {
+        line: {
+          borderWidth: 1,
+        },
+      },
       scales: {
         x: {
           min:
