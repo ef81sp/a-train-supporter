@@ -84,39 +84,23 @@
       </div>
     </div>
     <Button label="ふやす" @click="add" :style="buttonColorStyle" />
-    <DataTable
-      :value="selectedDiagramDataSet?.data"
-      :scrollable="true"
-      scrollHeight="50vh"
-      class="p-datatable-sm"
-    >
-      <Column field="station" header="駅">
-        <template #body="slotProps">
-          {{ getStationName(slotProps.data.stationId) }}
-        </template>
-      </Column>
-      <Column field="time" header="時刻">
-        <template #body="slotProps">
-          {{ formatDdHhmmToHhmm(slotProps.data.time) }}
-        </template>
-      </Column>
-    </DataTable>
+    <DiagramTimeTableManagerTable v-model="selectedDiagramDataSetData" />
   </template>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, watch } from "vue";
-import {
-  addMinute,
-  formatDdHhmmToHhmm,
-  generateChartData,
-  roundMinute,
-} from "@/logics/diagram";
+import { computed, defineComponent, ref, watch } from "vue";
+import { generateChartData, roundMinute } from "@/logics/diagram";
 import dayjs from "dayjs";
 import { useStore } from "@/store";
 import { DATE_FORMAT } from "@/common/const";
-import { Station, stationId } from "@/types";
+import { stationId } from "@/types";
+import DiagramTimeTableManagerTable from "@/components/DiagramTimeTableManagerTable.vue";
+
 export default defineComponent({
+  components: {
+    DiagramTimeTableManagerTable,
+  },
   props: {
     diagramDataSetId: { type: Number, default: undefined },
     refreshChart: Function,
@@ -131,9 +115,6 @@ export default defineComponent({
     const stationList = computed(
       () => store.getters.getShouldRecordTimeStationList
     );
-    const getStationName = computed(
-      () => (id: stationId) => store.getters.getStation(id)?.name
-    );
     const trainType = computed(() =>
       store.getters.getTrainTypeByTrainId(props.diagramDataSetId || 0)
     );
@@ -144,16 +125,25 @@ export default defineComponent({
     }));
 
     const selectedDiagramDataSet = computed(() => {
-      if (props.diagramDataSetId == undefined) {
-        return;
-      }
-      return store.getters.getTrainDiagramDataSetById(props.diagramDataSetId);
+      return store.getters.getTrainDiagramDataSetById(
+        props.diagramDataSetId || -1
+      );
+    });
+    const selectedDiagramDataSetData = computed({
+      get: () => selectedDiagramDataSet.value?.data,
+      set: (v) => {
+        if (!v) return;
+        store.dispatch("updateDiagramData", {
+          id: showingTrainId.value,
+          data: v,
+        });
+      },
     });
 
     const startStation = ref<stationId>(
-      selectedDiagramDataSet.value?.data.length
-        ? selectedDiagramDataSet.value.data[
-            selectedDiagramDataSet.value.data.length - 1
+      selectedDiagramDataSetData.value?.length
+        ? selectedDiagramDataSetData.value[
+            selectedDiagramDataSetData.value.length - 1
           ].stationId
         : stationList.value[0].id
     );
@@ -162,18 +152,18 @@ export default defineComponent({
     );
 
     const latestDataOnTheList = computed(() =>
-      selectedDiagramDataSet.value?.data.length
-        ? selectedDiagramDataSet.value.data[
-            selectedDiagramDataSet.value.data.length - 1
+      selectedDiagramDataSetData.value?.length
+        ? selectedDiagramDataSetData.value[
+            selectedDiagramDataSetData.value.length - 1
           ]
         : undefined
     );
 
-    nextDepartureTime.value = selectedDiagramDataSet.value?.data.length
+    nextDepartureTime.value = selectedDiagramDataSetData.value?.length
       ? dayjs(
           roundMinute(
-            selectedDiagramDataSet.value.data[
-              selectedDiagramDataSet.value.data.length - 1
+            selectedDiagramDataSetData.value[
+              selectedDiagramDataSetData.value.length - 1
             ].time,
             turnCycleTime.value
           ),
@@ -202,14 +192,14 @@ export default defineComponent({
     const showingTrainId = computed(() => store.state.showingTrainId);
 
     const add = () => {
-      if (!selectedDiagramDataSet.value) return;
+      if (!selectedDiagramDataSetData.value) return;
 
       if (!trainType.value) return;
 
       store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
         data: [
-          ...selectedDiagramDataSet.value?.data,
+          ...selectedDiagramDataSetData.value,
           ...generateChartData({
             startTime: nextDepartureTime.value,
             trainType: trainType.value,
@@ -225,17 +215,16 @@ export default defineComponent({
     };
 
     return {
+      trainType,
       nextDepartureTime,
       turnCycleTime,
       startStation,
       endStation,
       stationList,
-      getStationName,
-      trainType,
       buttonColorStyle,
       boundFor,
-      formatDdHhmmToHhmm,
       selectedDiagramDataSet,
+      selectedDiagramDataSetData,
       add,
     };
   },

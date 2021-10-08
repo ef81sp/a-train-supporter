@@ -11,7 +11,6 @@ import {
 import { createStore, useStore as baseUseStore, Store } from 'vuex';
 import { InjectionKey } from 'vue';
 import { chartJsData, chartJsDataSet, DiagramData } from '@/types/diagram';
-import { max } from 'date-fns';
 import dayjs from 'dayjs';
 import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
 import clonedeep from 'lodash.clonedeep';
