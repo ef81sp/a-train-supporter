@@ -399,7 +399,6 @@ export default createStore<State>({
 
       // localStorageに保存
       delete copiedState.__saveId;
-      console.log(copiedState);
       localStorage.setItem(String(state.__saveId), jsonStringify(copiedState));
     },
     undo(state) {

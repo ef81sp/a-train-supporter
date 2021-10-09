@@ -20,6 +20,22 @@
         <DiagramTimeTableManagerTimeEditor v-model="slotProps.data['time']" />
       </template>
     </Column>
+    <Column class="max-w-min">
+      <template #header>
+        <Button
+          icon="pi pi-trash"
+          class="p-button-warning p-button-sm"
+          @click="deleteTime"
+        />
+      </template>
+      <template #body="slotProps">
+        <Checkbox
+          v-model="checkBoxesForDelete[slotProps.index]"
+          :binary="true"
+          @input="(v) => onChangeCheckbox(slotProps.index, v)"
+        />
+      </template>
+    </Column>
   </DataTable>
 </template>
 <script lang="ts">
@@ -38,7 +54,7 @@ export default defineComponent({
     DiagramTimeTableManagerTimeEditor,
   },
   props: {
-    modelValue: Object as PropType<DiagramData[]>,
+    modelValue: { type: Object as PropType<DiagramData[]>, required: true },
   },
   emits: ["update:modelValue"],
   setup(props, context) {
@@ -48,6 +64,9 @@ export default defineComponent({
     );
 
     const copy = ref(clonedeep(props.modelValue));
+    const checkBoxesForDelete = ref<boolean[]>(
+      props.modelValue.map(() => false)
+    );
     watch(
       () => props.modelValue,
       () => {
@@ -57,11 +76,49 @@ export default defineComponent({
     const onCellEditComplete = () => {
       context.emit("update:modelValue", copy.value);
     };
+    const onChangeCheckbox = (index: number, value: boolean) => {
+      if (value) {
+        let hasTrue = false;
+        for (let i = 0; i < checkBoxesForDelete.value.length; i++) {
+          if (i === index) {
+            checkBoxesForDelete.value[i] = value;
+            break;
+          } else {
+            if (!hasTrue && checkBoxesForDelete.value[i]) {
+              hasTrue = true;
+            }
+            if (hasTrue) {
+              checkBoxesForDelete.value[i] = value;
+            }
+          }
+        }
+      } else {
+        for (let i = index; i < checkBoxesForDelete.value.length; i++) {
+          if (i > index && !checkBoxesForDelete.value[i]) {
+            break;
+          }
+          checkBoxesForDelete.value[i] = value;
+        }
+      }
+    };
+    const resetCheckbox = () => {
+      checkBoxesForDelete.value = props.modelValue.map(() => false);
+    };
+    const deleteTime = () => {
+      context.emit(
+        "update:modelValue",
+        copy.value.filter((v, i) => !checkBoxesForDelete.value[i])
+      );
+      resetCheckbox();
+    };
     return {
       getStationName,
       formatDdHhmmToHhmm,
       copy,
       onCellEditComplete,
+      checkBoxesForDelete,
+      onChangeCheckbox,
+      deleteTime,
     };
   },
 });
