@@ -1,6 +1,6 @@
 <template>
   <div class="grid p-1">
-    <div class="col-12 flex justify-content-end"><DiagramMenuButtons /></div>
+    <div class="col-12 flex justify-content-end"><DiagramMenu /></div>
     <div class="col-12">
       <Panel header="駅設定" :toggleable="true">
         <DiagramStationManager />
@@ -55,7 +55,7 @@ import { useStore } from "@/store";
 import { formatDdHhmmToHhmm } from "@/logics/diagram";
 import Chart from "primevue/chart";
 
-import DiagramMenuButtons from "./DiagramMenuButtons.vue";
+import DiagramMenu from "./DiagramMenu.vue";
 import DiagramTimeTableManager from "./DiagramTimeTableManager.vue";
 import DiagramTrainTypeManager from "./DiagramTrainTypeManager.vue";
 import DiagramStationManager from "./DiagramStationManager.vue";
@@ -63,7 +63,7 @@ import DiagramStationManager from "./DiagramStationManager.vue";
 export default defineComponent({
   components: {
     Chart,
-    DiagramMenuButtons,
+    DiagramMenu,
     DiagramTimeTableManager,
     DiagramTrainTypeManager,
     DiagramStationManager,

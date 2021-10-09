@@ -1,4 +1,5 @@
 <template>
+  <DiagramMenuDataSaveManager />
   <Button
     label="戻る"
     icon="pi pi-angle-left"
@@ -17,10 +18,14 @@
   <Button label="ヘルプ" icon="pi pi-question-circle" class="mx-1" />
 </template>
 <script lang="ts">
+import DiagramMenuDataSaveManager from "./DiagramMenuDataSaveManager.vue";
 import { computed, defineComponent } from "vue";
 import { useStore } from "@/store";
 
 export default defineComponent({
+  components: {
+    DiagramMenuDataSaveManager,
+  },
   setup() {
     const store = useStore();
     const canUndo = computed(

@@ -19,8 +19,9 @@ import {
   generateInitialNecessaryTime,
   getRandomLineColor,
 } from '@/logics/diagram';
+import { jsonParse, jsonStringify } from '@/common/util';
 
-const clonedeep = rfdc()
+const clonedeep = rfdc({ circles: true });
 
 export interface State {
   stationList: StationList;
@@ -30,6 +31,7 @@ export interface State {
   nextTrainId: number;
   __chartRefresh: () => void;
   __history?: { stack: State[]; nowIndex: number };
+  __saveId?: number;
 }
 
 export interface Getters {
@@ -148,6 +150,31 @@ const mockState: State = {
   showingTrainId: 1,
   nextTrainId: 6,
   __chartRefresh: () => void 0,
+  __saveId: 1,
+};
+
+const mergeState = (state: State, newState: State) => {
+  if (state.__history) {
+    Object.assign(
+      state,
+      Object.assign(newState, {
+        __history: {
+          stack: state.__history.stack,
+          nowIndex: state.__history.nowIndex - 1,
+        },
+      })
+    );
+  } else {
+    Object.assign(
+      state,
+      Object.assign(newState, {
+        __history: {
+          stack: [],
+          nowIndex: 0,
+        },
+      })
+    );
+  }
 };
 
 export default createStore<State>({
@@ -299,7 +326,7 @@ export default createStore<State>({
       state.showingTrainId = id;
     },
     addInitialTrainType(state) {
-      const newKey = Math.max(...state.trainTypes.keys()) + 1;
+      const newKey = Math.max(...state.trainTypes.keys(), 0) + 1;
       const newTrainType: TrainType = {
         id: newKey,
         name: `種別${newKey}`,
@@ -369,6 +396,11 @@ export default createStore<State>({
         state.__history.stack.shift();
       }
       state.__history.nowIndex = state.__history.stack.length - 1;
+
+      // localStorageに保存
+      delete copiedState.__saveId;
+      console.log(copiedState);
+      localStorage.setItem(String(state.__saveId), jsonStringify(copiedState));
     },
     undo(state) {
       if (!state.__history) return;
@@ -405,6 +437,19 @@ export default createStore<State>({
         })
       );
     },
+    loadData(state, id: number) {
+      const rawData = localStorage.getItem(String(id));
+      if (!rawData) {
+        const newState = clonedeep(initialState);
+        mergeState(state, newState);
+      } else {
+        const newState = jsonParse(rawData);
+        mergeState(state, newState);
+      }
+    },
+    setSaveId(state, id: number) {
+      state.__saveId = id;
+    },
   },
   actions: {
     addTrain(context, trainTypeId) {
@@ -436,6 +481,9 @@ export default createStore<State>({
     updateStationList(context, stations: Station[]) {
       context.commit('updateStationList', stations);
       context.commit('__logHistory');
+    },
+    loadData(context, id) {
+      context.commit('loadData', id);
     },
   },
   modules: {},

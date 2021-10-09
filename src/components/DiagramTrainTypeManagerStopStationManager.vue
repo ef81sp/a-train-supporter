@@ -50,7 +50,7 @@ export default defineComponent({
     const store = useStore();
     const stationList = computed(() => store.state.stationList.stations);
     const stoppingStationList = ref<number[]>(
-      clonedeep(props.trainType.stoppingStationList)
+      clonedeep(props.trainType.stoppingStationList || [])
     );
     const localVisible = computed({
       get: () => props.visible,

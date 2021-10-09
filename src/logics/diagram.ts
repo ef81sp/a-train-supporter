@@ -156,7 +156,7 @@ export const generateInitialNecessaryTime = (
   if (boundFor === 'B') {
     list.reverse();
   }
-  let previousStationId: stationId = list[0].id;
+  let previousStationId: stationId = list[0]?.id;
   list.forEach((station, idx) => {
     if (idx === 0) return;
     if (!station.shouldRecordTime) return;
