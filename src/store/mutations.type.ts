@@ -11,28 +11,33 @@ interface MutationPayload {
   };
   updateDiagramData: { id: number; data: DiagramData[] };
   setShowingTrainId: { id: number };
-  addInitialTrainType: void;
   updateTrainType: { id: number; data: TrainType };
   addTrain: { trainTypeId: number; trainId: number };
-  incrementTrainId: void;
   setChartRefresh: { chartRef: () => void };
   __updateLineColorAndTrainName: { trainTypeId: number };
+  loadData: { id: number };
+  setSaveId: { id: number };
+}
+
+interface NoPayloadMutation {
+  addInitialTrainType: void;
+  incrementTrainId: void;
   __logHistory: void;
   undo: void;
   redo: void;
-  loadData: { id: number }
-  setSaveId: {id: number}
 }
 
 export interface MyCommit {
-  <T extends keyof MutationPayload>(
-    type: T,
-    payload?: MutationPayload[T]
-  ): void;
+  <T extends keyof MutationPayload>(type: T, payload: MutationPayload[T]): void;
+  <T extends keyof NoPayloadMutation>(type: T): void;
 }
-export type MyMutation = {
+type MyMutationWithPayload = {
   [P in keyof MutationPayload]: (
     state: State,
     payload: MutationPayload[P]
   ) => void;
 };
+type MyMutationNoPayload = {
+  [P in keyof NoPayloadMutation]: (state: State) => void;
+};
+export type MyMutation = MyMutationWithPayload & MyMutationNoPayload;

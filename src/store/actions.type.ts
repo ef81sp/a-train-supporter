@@ -17,21 +17,31 @@ interface ActionPayload {
   };
   updateDiagramData: { id: number; data: DiagramData[] };
   addTrain: { trainTypeId: number };
-  addInitialTrainType: void;
   updateTrainType: { id: number; data: TrainType };
   loadData: { id: number };
+}
+
+interface NoPayloadAction {
+  addInitialTrainType: void;
 }
 
 export interface MyDispatch {
   <T extends keyof ActionPayload>(
     type: T,
-    payload?: ActionPayload[T]
+    payload: ActionPayload[T]
   ): Promise<any>;
+  <T extends keyof NoPayloadAction>(type: T): Promise<any>;
 }
 
-export type MyActions = {
+type MyActionsWithPayload = {
   [P in keyof ActionPayload]: (
     ctx: MyActionContext,
     payload: ActionPayload[P]
   ) => void;
 };
+
+type MyActionsNoPayload = {
+  [P in keyof ActionPayload]: (ctx: MyActionContext) => void;
+};
+
+export type MyActions = MyActionsWithPayload & MyActionsNoPayload;
