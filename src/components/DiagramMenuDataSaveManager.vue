@@ -23,8 +23,8 @@ export default defineComponent({
     const saveId = ref(1);
     const store = useStore();
     watch(saveId, () => {
-      store.commit("setSaveId", saveId.value);
-      store.dispatch("loadData", saveId.value);
+      store.commit("setSaveId", { id: saveId.value });
+      store.dispatch("loadData", { id: saveId.value });
     });
     return {
       saveId,

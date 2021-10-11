@@ -7,7 +7,7 @@ import { GetterTree } from 'vuex';
 import rfdc from 'rfdc';
 const clone = rfdc();
 
-export interface Getters {
+export interface MyGetters {
   getStationNameList: string[];
   getShouldRecordTimeStationList: Station[];
   getTerminalStation: TerminalStation;
@@ -21,34 +21,34 @@ export interface Getters {
 }
 
 export const getters: GetterTree<State, State> = {
-  getStationNameList({ stationList }): Getters['getStationNameList'] {
+  getStationNameList({ stationList }): MyGetters['getStationNameList'] {
     return stationList.stations.map((v: Station) => v.name);
   },
-  getStation({ stationList }): Getters['getStation'] {
+  getStation({ stationList }): MyGetters['getStation'] {
     return (id) => stationList.stations.find((v) => v.id === id);
   },
   getShouldRecordTimeStationList({
     stationList,
-  }): Getters['getShouldRecordTimeStationList'] {
+  }): MyGetters['getShouldRecordTimeStationList'] {
     return stationList.stations.filter((v) => v.shouldRecordTime);
   },
-  getTerminalStation({ stationList }): Getters['getTerminalStation'] {
+  getTerminalStation({ stationList }): MyGetters['getTerminalStation'] {
     return {
       startingStationId: stationList.startingStationId,
       endingStationId: stationList.endingStationId,
     };
   },
-  getTrainType({ trainTypes }): Getters['getTrainType'] {
+  getTrainType({ trainTypes }): MyGetters['getTrainType'] {
     return (key: number) => trainTypes.get(key);
   },
-  getTrainTypeByTrainId({ trainTypes }): Getters['getTrainTypeByTrainId'] {
+  getTrainTypeByTrainId({ trainTypes }): MyGetters['getTrainTypeByTrainId'] {
     return (key: number) =>
       [...trainTypes.values()].find((v) => v.trainIdList.includes(key));
   },
   getChatrJsData(
     { diagramData }: State,
-    getters: Getters
-  ): Getters['getChatrJsData'] {
+    getters: MyGetters
+  ): MyGetters['getChatrJsData'] {
     const result: chartJsData = clone(diagramData);
     for (const dataset of result.datasets) {
       for (const data of dataset.data) {
@@ -59,7 +59,7 @@ export const getters: GetterTree<State, State> = {
   },
   getMinAndMaxTimeOnDiagramData({
     diagramData,
-  }: State): Getters['getMinAndMaxTimeOnDiagramData'] {
+  }: State): MyGetters['getMinAndMaxTimeOnDiagramData'] {
     const result = diagramData.datasets.reduce(
       (prev, cur, idx) => {
         if (cur.data.length === 0) return prev;
@@ -99,10 +99,10 @@ export const getters: GetterTree<State, State> = {
   },
   getTrainDiagramDataSetById({
     diagramData,
-  }): Getters['getTrainDiagramDataSetById'] {
+  }): MyGetters['getTrainDiagramDataSetById'] {
     return (id) => diagramData.datasets.find((v) => v.id === id);
   },
-  getHistoryInfo({ __history }): Getters['getHistoryInfo'] {
+  getHistoryInfo({ __history }): MyGetters['getHistoryInfo'] {
     return {
       nowIndex: __history ? __history.nowIndex : 0,
       length: __history ? __history.stack.length : 0,

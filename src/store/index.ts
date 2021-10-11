@@ -4,9 +4,11 @@ import { InjectionKey } from 'vue';
 import { chartJsData } from '@/types/diagram';
 import { LINE_COLORS } from '@/common/const';
 import rfdc from 'rfdc';
-import { Getters, getters } from './getters';
-import { mutations, Mutations } from './mutations';
+import { MyGetters, getters } from './getters';
+import { mutations } from './mutations';
 import { actions } from './actions';
+import { MyCommit } from './mutations.type';
+import { MyDispatch } from './actions.type';
 
 const clonedeep = rfdc({ circles: true });
 
@@ -22,9 +24,10 @@ export interface State {
 }
 
 // getters等々に補完が効かないのきつすぎる
-export interface IStore extends Store<State> {
-  getters: Getters;
-  mutations: Mutations;
+export interface MyStore extends Store<State> {
+  getters: MyGetters;
+  commit: MyCommit;
+  dispatch: MyDispatch;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -129,5 +132,5 @@ export default createStore<State>({
 });
 
 export const useStore = () => {
-  return baseUseStore(key) as IStore;
+  return baseUseStore(key) as MyStore;
 };

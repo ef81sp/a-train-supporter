@@ -3,15 +3,15 @@ import {
   generateInitialNecessaryTime,
   getRandomLineColor,
 } from '@/logics/diagram';
-import { NecessaryTimeMap, Station, TrainType } from '@/types';
+import { TrainType } from '@/types';
 import { DiagramData } from '@/types/diagram';
 import dayjs from 'dayjs';
-import { MutationTree } from 'vuex';
 import { initialState, State } from '.';
 import equal from 'fast-deep-equal/es6';
 
 import rfdc from 'rfdc';
 import { jsonParse, jsonStringify } from '@/common/util';
+import { MyMutation } from './mutations.type';
 const clone = rfdc();
 
 const mergeState = (state: State, newState: State) => {
@@ -38,20 +38,10 @@ const mergeState = (state: State, newState: State) => {
   }
 };
 
-export interface Mutations {
-  updateStationsList: (
-    { diagramData: chartJsData }: State,
-    stations: string[]
-  ) => void;
-  updateDiagramData: (
-    { diagramData: chartJsData }: State,
-    { id, data }: { id: number; data: DiagramData[] }
-  ) => void;
-  setShowingTrainId: (state: State, id: number) => void;
-}
+export * from './mutations.type';
 
-export const mutations: MutationTree<State> = {
-  updateStationList(state, stations: Station[]) {
+export const mutations: MyMutation = {
+  updateStationList: (state, stations) => {
     state.diagramData.labels = stations
       .filter((v) => v.shouldRecordTime)
       .map((v) => v.name);
@@ -62,15 +52,7 @@ export const mutations: MutationTree<State> = {
   },
   updateTrainTypeNecessaryTimeTable(
     state,
-    {
-      trainTypeId,
-      boundFor,
-      newNecessaryTimeMap,
-    }: {
-      trainTypeId: number;
-      boundFor: 'A' | 'B';
-      newNecessaryTimeMap: NecessaryTimeMap;
-    }
+    { trainTypeId, boundFor, newNecessaryTimeMap }
   ) {
     const target = state.trainTypes.get(trainTypeId);
     if (!target) return;
@@ -80,7 +62,7 @@ export const mutations: MutationTree<State> = {
       target.necessaryTimesB = newNecessaryTimeMap;
     }
   },
-  updateDiagramData(state, { id, data }: { id: number; data: DiagramData[] }) {
+  updateDiagramData(state, { id, data }) {
     const target = state.diagramData.datasets.find((v) => v.id === id);
     if (target) {
       target.data = dedupe(data).sort((a, b) => {
@@ -96,7 +78,7 @@ export const mutations: MutationTree<State> = {
       ];
     }
   },
-  setShowingTrainId(state, id: number) {
+  setShowingTrainId(state, { id }) {
     state.showingTrainId = id;
   },
   addInitialTrainType(state) {
@@ -112,23 +94,10 @@ export const mutations: MutationTree<State> = {
     };
     state.trainTypes.set(newKey, newTrainType);
   },
-  updateTrainType(state, { id, data }: { id: number; data: TrainType }) {
+  updateTrainType(state, { id, data }) {
     state.trainTypes.set(id, data);
   },
-  __updateLineColorAndTrainName(state, trainTypeId: number) {
-    const trainType = state.trainTypes.get(trainTypeId);
-    if (!trainType) return;
-    let trainTypeNo = 1;
-    for (const dataset of state.diagramData.datasets) {
-      if (!trainType.trainIdList.includes(dataset.id)) continue;
-      dataset.borderColor = trainType.lineColor;
-      dataset.label = `${trainType.name}-${trainTypeNo++}`;
-    }
-  },
-  addTrain(
-    state,
-    { trainTypeId, trainId }: { trainTypeId: number; trainId: number }
-  ) {
+  addTrain(state, { trainTypeId, trainId }) {
     const trainType = state.trainTypes.get(trainTypeId);
     if (!trainType) return;
 
@@ -151,8 +120,18 @@ export const mutations: MutationTree<State> = {
   incrementTrainId(state) {
     state.nextTrainId++;
   },
-  setChartRefresh(state, chartRef) {
+  setChartRefresh(state, { chartRef }) {
     state.__chartRefresh = chartRef;
+  },
+  __updateLineColorAndTrainName(state, { trainTypeId }) {
+    const trainType = state.trainTypes.get(trainTypeId);
+    if (!trainType) return;
+    let trainTypeNo = 1;
+    for (const dataset of state.diagramData.datasets) {
+      if (!trainType.trainIdList.includes(dataset.id)) continue;
+      dataset.borderColor = trainType.lineColor;
+      dataset.label = `${trainType.name}-${trainTypeNo++}`;
+    }
   },
   __logHistory(state) {
     const copiedState = clone(state);
@@ -206,7 +185,7 @@ export const mutations: MutationTree<State> = {
       })
     );
   },
-  loadData(state, id: number) {
+  loadData(state, { id }) {
     const rawData = localStorage.getItem(String(id));
     if (!rawData) {
       const newState = clone(initialState);
@@ -216,7 +195,7 @@ export const mutations: MutationTree<State> = {
       mergeState(state, newState);
     }
   },
-  setSaveId(state, id: number) {
+  setSaveId(state, { id }) {
     state.__saveId = id;
   },
 };

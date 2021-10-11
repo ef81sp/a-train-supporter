@@ -2,9 +2,10 @@ import { Station, TrainType } from '@/types';
 import { DiagramData } from '@/types/diagram';
 import { ActionTree } from 'vuex';
 import { State } from '.';
+import { MyActions } from './actions.type';
 
-export const actions: ActionTree<State, State> = {
-  addTrain(context, trainTypeId) {
+export const actions: MyActions = {
+  addTrain(context, { trainTypeId }) {
     const nextTrainId = context.state.nextTrainId;
     context.commit('addTrain', { trainTypeId, trainId: nextTrainId });
     context.commit('incrementTrainId');
@@ -16,9 +17,11 @@ export const actions: ActionTree<State, State> = {
     context.dispatch('addTrain', newTrainTypeId);
     // context.commit('__logHistory'); // addTrain側でやるので省略
   },
-  updateTrainType(context, payload: { id: number; data: TrainType }) {
+  updateTrainType(context, payload) {
     context.commit('updateTrainType', payload);
-    context.commit('__updateLineColorAndTrainName', payload.id);
+    context.commit('__updateLineColorAndTrainName', {
+      trainTypeId: payload.id,
+    });
     context.state.__chartRefresh();
     context.commit('__logHistory');
   },
@@ -26,15 +29,15 @@ export const actions: ActionTree<State, State> = {
     context.commit('updateTrainTypeNecessaryTimeTable', payload);
     context.commit('__logHistory');
   },
-  updateDiagramData(context, payload: { id: number; data: DiagramData[] }) {
+  updateDiagramData(context, payload) {
     context.commit('updateDiagramData', payload);
     context.commit('__logHistory');
   },
-  updateStationList(context, stations: Station[]) {
-    context.commit('updateStationList', stations);
+  updateStationList(context, payload) {
+    context.commit('updateStationList', payload);
     context.commit('__logHistory');
   },
-  loadData(context, id) {
-    context.commit('loadData', id);
+  loadData(context, payload) {
+    context.commit('loadData', payload);
   },
 };

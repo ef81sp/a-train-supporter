@@ -91,7 +91,7 @@ import DiagramTrainTypeManagerStopStationManager from "./DiagramTrainTypeManager
 
 export default defineComponent({
   props: {
-    trainTypeId: Number,
+    trainTypeId: { type: Number, required: true },
   },
   components: {
     DiagramTrainTypeNecessaryTimeTable,
@@ -103,7 +103,7 @@ export default defineComponent({
     const trainType = computed({
       get: () => store.getters.getTrainType(props.trainTypeId || 0),
       set: (value) => {
-        console.log("here");
+        if (!value) return;
         store.dispatch("updateTrainType", {
           id: props.trainTypeId,
           data: value,
@@ -113,6 +113,7 @@ export default defineComponent({
     const necessaryTimesA = computed({
       get: () => trainType.value?.necessaryTimesA,
       set: (value) => {
+        if (!value) return;
         store.dispatch("updateTrainTypeNecessaryTimeTable", {
           trainTypeId: props.trainTypeId,
           boundFor: "A",
@@ -123,6 +124,7 @@ export default defineComponent({
     const necessaryTimesB = computed({
       get: () => trainType.value?.necessaryTimesB,
       set: (value) => {
+        if (!value) return;
         store.dispatch("updateTrainTypeNecessaryTimeTable", {
           trainTypeId: props.trainTypeId,
           boundFor: "B",
@@ -132,7 +134,7 @@ export default defineComponent({
     });
 
     const changeTrainId = (id: number) => {
-      store.commit("setShowingTrainId", id);
+      store.commit("setShowingTrainId", { id });
     };
 
     const lineColor = ref<string>(trainType.value?.lineColor || "");
@@ -164,7 +166,10 @@ export default defineComponent({
 
     const isVisibleStopStationManagerModal = ref<boolean>(false);
 
-    const addTrain = () => store.dispatch("addTrain", trainType.value?.id);
+    const addTrain = () => {
+      if (!trainType.value) return;
+      store.dispatch("addTrain", { trainTypeId: trainType.value.id });
+    };
     const editStopStation = () => {
       isVisibleStopStationManagerModal.value = true;
     };
