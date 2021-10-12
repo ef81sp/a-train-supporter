@@ -1,55 +1,34 @@
 import { DATE_FORMAT } from '@/common/const';
-import { Station, stationId, TerminalStation, TrainType } from '@/types';
-import { chartJsData, chartJsDataSet } from '@/types/diagram';
 import dayjs from 'dayjs';
-import { State } from '.';
-import { GetterTree } from 'vuex';
 import rfdc from 'rfdc';
+import { MyGettersFunctions } from './getters.type';
 const clone = rfdc();
 
-export interface MyGetters {
-  getStationNameList: string[];
-  getShouldRecordTimeStationList: Station[];
-  getTerminalStation: TerminalStation;
-  getStation: (key: stationId) => Station | undefined;
-  getTrainType: (key: number) => TrainType | undefined;
-  getTrainTypeByTrainId: (key: number) => TrainType | undefined;
-  getChatrJsData: chartJsData;
-  getMinAndMaxTimeOnDiagramData: { min: string; max: string };
-  getTrainDiagramDataSetById: (id: number) => chartJsDataSet | undefined;
-  getHistoryInfo: { nowIndex: number; length: number };
-}
-
-export const getters: GetterTree<State, State> = {
-  getStationNameList({ stationList }): MyGetters['getStationNameList'] {
-    return stationList.stations.map((v: Station) => v.name);
+export const getters: MyGettersFunctions = {
+  getStationNameList({ stationList }) {
+    return stationList.stations.map((v) => v.name);
   },
-  getStation({ stationList }): MyGetters['getStation'] {
+  getStation({ stationList }) {
     return (id) => stationList.stations.find((v) => v.id === id);
   },
-  getShouldRecordTimeStationList({
-    stationList,
-  }): MyGetters['getShouldRecordTimeStationList'] {
+  getShouldRecordTimeStationList({ stationList }) {
     return stationList.stations.filter((v) => v.shouldRecordTime);
   },
-  getTerminalStation({ stationList }): MyGetters['getTerminalStation'] {
+  getTerminalStation({ stationList }) {
     return {
       startingStationId: stationList.startingStationId,
       endingStationId: stationList.endingStationId,
     };
   },
-  getTrainType({ trainTypes }): MyGetters['getTrainType'] {
+  getTrainType({ trainTypes }) {
     return (key: number) => trainTypes.get(key);
   },
-  getTrainTypeByTrainId({ trainTypes }): MyGetters['getTrainTypeByTrainId'] {
+  getTrainTypeByTrainId({ trainTypes }) {
     return (key: number) =>
       [...trainTypes.values()].find((v) => v.trainIdList.includes(key));
   },
-  getChatrJsData(
-    { diagramData }: State,
-    getters: MyGetters
-  ): MyGetters['getChatrJsData'] {
-    const result: chartJsData = clone(diagramData);
+  getChatrJsData({ diagramData }, getters) {
+    const result = clone(diagramData);
     for (const dataset of result.datasets) {
       for (const data of dataset.data) {
         data.name = getters.getStation(data.stationId)?.name;
@@ -57,9 +36,7 @@ export const getters: GetterTree<State, State> = {
     }
     return result;
   },
-  getMinAndMaxTimeOnDiagramData({
-    diagramData,
-  }: State): MyGetters['getMinAndMaxTimeOnDiagramData'] {
+  getMinAndMaxTimeOnDiagramData({ diagramData }) {
     const result = diagramData.datasets.reduce(
       (prev, cur, idx) => {
         if (cur.data.length === 0) return prev;
@@ -97,12 +74,10 @@ export const getters: GetterTree<State, State> = {
       .format(DATE_FORMAT);
     return result;
   },
-  getTrainDiagramDataSetById({
-    diagramData,
-  }): MyGetters['getTrainDiagramDataSetById'] {
+  getTrainDiagramDataSetById({ diagramData }) {
     return (id) => diagramData.datasets.find((v) => v.id === id);
   },
-  getHistoryInfo({ __history }): MyGetters['getHistoryInfo'] {
+  getHistoryInfo({ __history }) {
     return {
       nowIndex: __history ? __history.nowIndex : 0,
       length: __history ? __history.stack.length : 0,

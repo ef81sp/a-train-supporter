@@ -4,11 +4,12 @@ import { InjectionKey } from 'vue';
 import { chartJsData } from '@/types/diagram';
 import { LINE_COLORS } from '@/common/const';
 import rfdc from 'rfdc';
-import { MyGetters, getters } from './getters';
+import { getters } from './getters';
 import { mutations } from './mutations';
 import { actions } from './actions';
 import { MyCommit } from './mutations.type';
 import { MyDispatch } from './actions.type';
+import { MyGetters } from './getters.type';
 
 const clonedeep = rfdc({ circles: true });
 
@@ -44,7 +45,7 @@ export const initialState: State = {
     datasets: [],
   },
   showingTrainId: 1,
-  nextTrainId: 6,
+  nextTrainId: 2,
   __chartRefresh: () => void 0,
 };
 
