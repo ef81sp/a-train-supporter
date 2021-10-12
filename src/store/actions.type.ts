@@ -41,7 +41,7 @@ type MyActionsWithPayload = {
 };
 
 type MyActionsNoPayload = {
-  [P in keyof ActionPayload]: (ctx: MyActionContext) => void;
+  [P in keyof NoPayloadAction]: (ctx: MyActionContext) => void;
 };
 
 export type MyActions = MyActionsWithPayload & MyActionsNoPayload;
