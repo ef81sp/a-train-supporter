@@ -3,7 +3,6 @@ import { chartJsData, chartJsDataSet } from '@/types/diagram';
 import { State } from '.';
 
 export interface MyGetters {
-  getStationNameList: string[];
   getShouldRecordTimeStationList: Station[];
   getTerminalStation: TerminalStation;
   getStation: (key: stationId) => Station | undefined;

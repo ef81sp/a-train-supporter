@@ -142,7 +142,7 @@ export default defineComponent({
 
     onMounted(() => {
       if (!chartRef.value) return;
-      store.commit("setChartRefresh", { chartRef: chartRef.value.refresh });
+      store.commit("setChartRefresh", { chartRefresh: chartRef.value.refresh });
     });
 
     return {

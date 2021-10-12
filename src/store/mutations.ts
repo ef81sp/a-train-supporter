@@ -120,8 +120,8 @@ export const mutations: MyMutation = {
   incrementTrainId(state) {
     state.nextTrainId++;
   },
-  setChartRefresh(state, { chartRef }) {
-    state.__chartRefresh = chartRef;
+  setChartRefresh(state, { chartRefresh }) {
+    state.__chartRefresh = chartRefresh;
   },
   __updateLineColorAndTrainName(state, { trainTypeId }) {
     const trainType = state.trainTypes.get(trainTypeId);

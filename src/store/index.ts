@@ -114,7 +114,7 @@ const mockState: State = {
     ],
   },
   showingTrainId: 1,
-  nextTrainId: 6,
+  nextTrainId: 2,
   __chartRefresh: () => void 0,
   __saveId: 1,
 };

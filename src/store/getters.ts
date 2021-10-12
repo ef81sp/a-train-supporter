@@ -5,9 +5,6 @@ import { MyGettersFunctions } from './getters.type';
 const clone = rfdc();
 
 export const getters: MyGettersFunctions = {
-  getStationNameList({ stationList }) {
-    return stationList.stations.map((v) => v.name);
-  },
   getStation({ stationList }) {
     return (id) => stationList.stations.find((v) => v.id === id);
   },

@@ -13,7 +13,7 @@ interface MutationPayload {
   setShowingTrainId: { id: number };
   updateTrainType: { id: number; data: TrainType };
   addTrain: { trainTypeId: number; trainId: number };
-  setChartRefresh: { chartRef: () => void };
+  setChartRefresh: { chartRefresh: () => void };
   __updateLineColorAndTrainName: { trainTypeId: number };
   loadData: { id: number };
   setSaveId: { id: number };
