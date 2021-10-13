@@ -57,7 +57,7 @@
             class="w-10 text-left"
           />
         </div>
-        <div class="field col-4">
+        <div class="field col-4 p-0">
           <label
             for="next-nextDepartureTime"
             class="col-fixed text-sm"
@@ -76,10 +76,10 @@
         <div class="field col-4">
           <label
             for="turn-cycle-nextDepartureTime"
-            class="col-fixed text-sm"
+            class="col-fixed text-sm p-0"
             style="display: block"
           >
-            折返周期(分)
+            折返周期<span class="text-xs">(分)</span>
           </label>
           <InputNumber
             id="turn-cycle-nextDepartureTime"
