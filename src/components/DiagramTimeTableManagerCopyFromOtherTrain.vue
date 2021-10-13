@@ -4,7 +4,6 @@
     :modal="true"
     :dismissableMask="true"
     v-model:visible="localVisible"
-    @hide="onHide"
     @show="initialize"
     class="dttmcfot-dialog"
   >
@@ -131,9 +130,6 @@ export default defineComponent({
       });
       localVisible.value = false;
     };
-    const onHide = () => {
-      // stoppingStationList.value = clone(props.trainType.stoppingStationList);
-    };
     const initialize = () => {
       // initialize
       offset.value = 0;
@@ -143,7 +139,6 @@ export default defineComponent({
     return {
       localVisible,
       onClick,
-      onHide,
       initialize,
       diagramDataSets,
       selectedTrainFromTrain,

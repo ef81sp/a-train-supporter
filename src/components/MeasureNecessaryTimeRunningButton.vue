@@ -1,9 +1,7 @@
 <template>
-  <Button
-    @click="onClick"
-    :label="buttonRunningLabel"
-    :class="buttonRunningClass"
-  />
+  <Button @click="onClick" :class="buttonRunningClass">
+    <span :class="buttonRunningIcon" />{{ buttonRunningLabel }}
+  </Button>
 </template>
 
 <script lang="ts">
@@ -14,16 +12,24 @@ export default defineComponent({
   props: {
     onClick: Function,
     isRunning: Boolean,
+    class: String,
   },
   setup(props) {
     const buttonRunningLabel = computed(() =>
-      props.isRunning ? "とまった" : "はしった"
+      props.isRunning ? "停車" : "発車"
     );
-    const buttonRunningClass = computed(() =>
-      props.isRunning ? "p-button-secondary" : ""
+    const buttonRunningIcon = computed(
+      () => `mx-1 pi ${props.isRunning ? "pi-pause" : "pi-play"}`
+    );
+    const buttonRunningClass = computed(
+      () =>
+        props.class +
+        " flex justify-content-center " +
+        (props.isRunning ? "p-button-secondary" : "")
     );
     return {
       buttonRunningLabel,
+      buttonRunningIcon,
       buttonRunningClass,
     };
   },

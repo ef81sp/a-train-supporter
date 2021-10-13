@@ -51,6 +51,10 @@
         v-model:visible="isVisibleStopStationManagerModal"
         v-model:trainType="trainType"
       />
+      <DiagramTrainTypeManagerNecessaryTimeManager
+        v-model:visible="isVisibleMeasureNecessaryTimeDialog"
+        v-model:trainType="trainType"
+      />
     </template>
     <div
       v-if="trainType"
@@ -67,12 +71,10 @@
       </Button>
     </div>
     <DiagramTrainTypeNecessaryTimeTable
-      :trainTypeId="trainTypeId"
       v-model="necessaryTimesA"
       boundFor="A"
     />
     <DiagramTrainTypeNecessaryTimeTable
-      :trainTypeId="trainTypeId"
       v-model="necessaryTimesB"
       boundFor="B"
     />
@@ -88,6 +90,7 @@ const clonedeep = rfdc();
 
 import DiagramTrainTypeNecessaryTimeTable from "./DiagramTrainTypeNecessaryTimeTable.vue";
 import DiagramTrainTypeManagerStopStationManager from "./DiagramTrainTypeManagerStopStationManager.vue";
+import DiagramTrainTypeManagerNecessaryTimeManager from "./DiagramTrainTypeManagerNecessaryTimeManager.vue";
 
 export default defineComponent({
   props: {
@@ -96,6 +99,7 @@ export default defineComponent({
   components: {
     DiagramTrainTypeNecessaryTimeTable,
     DiagramTrainTypeManagerStopStationManager,
+    DiagramTrainTypeManagerNecessaryTimeManager,
   },
   setup(props) {
     const store = useStore();
@@ -173,8 +177,18 @@ export default defineComponent({
     const editStopStation = () => {
       isVisibleStopStationManagerModal.value = true;
     };
+
+    const isVisibleMeasureNecessaryTimeDialog = ref(false);
+    const measureNecessaryTime = () => {
+      isVisibleMeasureNecessaryTimeDialog.value = true;
+    };
     const splitButtonItems = ref([
       { label: "停車駅編集", icon: "pi pi-list", command: editStopStation },
+      {
+        label: "所要時間計測",
+        icon: "pi pi-clock",
+        command: measureNecessaryTime,
+      },
     ]);
     return {
       trainType,
@@ -189,6 +203,7 @@ export default defineComponent({
       necessaryTimesB,
       splitButtonItems,
       isVisibleStopStationManagerModal,
+      isVisibleMeasureNecessaryTimeDialog,
     };
   },
 });

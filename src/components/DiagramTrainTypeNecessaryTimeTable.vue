@@ -2,7 +2,7 @@
   <DataTable
     :value="necessaryTimeArray"
     class="my-1 p-datatable-sm min-w-max max-w-full"
-    editMode="cell"
+    :editMode="editable ? 'cell' : null"
     @cell-edit-complete="onCellEditComplete"
   >
     <template #header>
@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { NecessaryTime, NecessaryTimeMap, stationId } from "@/types";
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import rfdc from "rfdc";
 import { useStore } from "@/store";
 
@@ -41,9 +41,9 @@ const clonedeep = rfdc();
 
 export default defineComponent({
   props: {
-    trainTypeId: Number,
     modelValue: Object as PropType<NecessaryTimeMap>,
     boundFor: String as PropType<"A" | "B">,
+    editable: { type: Boolean, default: true },
   },
   emits: ["update:modelValue"],
   setup(props, context) {
