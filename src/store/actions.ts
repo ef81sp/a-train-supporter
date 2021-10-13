@@ -1,7 +1,3 @@
-import { Station, TrainType } from '@/types';
-import { DiagramData } from '@/types/diagram';
-import { ActionTree } from 'vuex';
-import { State } from '.';
 import { MyActions } from './actions.type';
 
 export const actions: MyActions = {

@@ -8,7 +8,7 @@ import {
   TrainType,
   TrainTypeMap,
 } from '@/types';
-import { DiagramData } from '@/types/diagram';
+import { DiagramData, offsetDirectionCode } from '@/types/diagram';
 import dayjs from 'dayjs';
 import rfdc from 'rfdc';
 
@@ -179,4 +179,33 @@ export const getRandomLineColor = (trainTypes: TrainTypeMap) => {
   );
   const colors = LINE_COLORS.filter((v) => !usedColors.includes(v.value));
   return colors[Math.floor(Math.random() * colors.length)];
+};
+
+export const offsetDiagramDatas = (
+  diagramDatas: DiagramData[],
+  offset: number,
+  direction: offsetDirectionCode
+): DiagramData[] => {
+  if (offset === 0) {
+    return clonedeep(diagramDatas);
+  }
+  let sign = 1;
+  if (direction === 'forward') {
+    sign = 1;
+  } else {
+    sign = -1;
+  }
+  const _offset = offset * sign;
+  return diagramDatas.map((data) => {
+    const result: DiagramData = {
+      stationId: data.stationId,
+      time: dayjs(data.time, DATE_FORMAT)
+        .add(_offset, 'minute')
+        .format(DATE_FORMAT),
+    };
+    if (data.name) {
+      result.name = data.name;
+    }
+    return result;
+  });
 };

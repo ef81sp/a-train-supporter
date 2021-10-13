@@ -1,91 +1,109 @@
 <template>
-  <template v-if="selectedDiagramDataSet">
-    <p class="font-bold">
-      <span :style="{ color: trainType?.lineColor }">■</span>
+  <Panel header="時刻" class="my-2">
+    <template #icons> </template>
+    <template v-if="selectedDiagramDataSet">
+      <p class="font-bold">
+        <span :style="{ color: trainType?.lineColor }">■</span>
+        {{ selectedDiagramDataSet.label }}
+      </p>
 
-      {{ selectedDiagramDataSet.label }}
-    </p>
-    <div class="formgrid grid">
-      <div class="field col-6">
-        <label
-          for="startStation"
-          class="col-fixed text-sm"
-          style="display: block"
-        >
-          発駅
-        </label>
-        <Dropdown
-          id="startStation"
-          v-model="startStation"
-          :options="stationList"
-          optionLabel="name"
-          optionValue="id"
-          class="w-10 text-left"
-        />
+      <div class="formgrid grid">
+        <div class="field col-6">
+          <label
+            for="startStation"
+            class="col-fixed text-sm"
+            style="display: block"
+          >
+            発駅
+          </label>
+          <Dropdown
+            id="startStation"
+            v-model="startStation"
+            :options="stationList"
+            optionLabel="name"
+            optionValue="id"
+            class="w-10 text-left"
+          />
+        </div>
+        <div class="field col-6">
+          <label
+            for="endStation"
+            class="col-fixed text-sm"
+            style="display: block"
+          >
+            着駅
+          </label>
+          <Dropdown
+            id="endStation"
+            v-model="endStation"
+            :options="stationList"
+            optionLabel="name"
+            optionValue="id"
+            class="w-10 text-left"
+          />
+        </div>
+        <div class="field col-4">
+          <label
+            for="boundFor"
+            class="col-fixed text-sm"
+            style="display: block"
+          >
+            方面
+          </label>
+          <Dropdown
+            id="boundFor"
+            v-model="boundFor"
+            :options="['A', 'B', 'AB', 'BA']"
+            class="w-10 text-left"
+          />
+        </div>
+        <div class="field col-4">
+          <label
+            for="next-nextDepartureTime"
+            class="col-fixed text-sm"
+            style="display: block"
+          >
+            次発
+          </label>
+          <Calendar
+            id="next-nextDepartureTime"
+            :timeOnly="true"
+            hourFormat="24"
+            v-model="nextDepartureTime"
+            class="w-10"
+          />
+        </div>
+        <div class="field col-4">
+          <label
+            for="turn-cycle-nextDepartureTime"
+            class="col-fixed text-sm"
+            style="display: block"
+          >
+            折返周期(分)
+          </label>
+          <InputNumber
+            id="turn-cycle-nextDepartureTime"
+            mode="decimal"
+            v-model="turnCycleTime"
+            class="w-10"
+          />
+        </div>
       </div>
-      <div class="field col-6">
-        <label
-          for="endStation"
-          class="col-fixed text-sm"
-          style="display: block"
-        >
-          着駅
-        </label>
-        <Dropdown
-          id="endStation"
-          v-model="endStation"
-          :options="stationList"
-          optionLabel="name"
-          optionValue="id"
-          class="w-10 text-left"
-        />
-      </div>
-      <div class="field col-4">
-        <label for="boundFor" class="col-fixed text-sm" style="display: block">
-          方面
-        </label>
-        <Dropdown
-          id="boundFor"
-          v-model="boundFor"
-          :options="['A', 'B', 'AB', 'BA']"
-          class="w-10 text-left"
-        />
-      </div>
-      <div class="field col-4">
-        <label
-          for="next-nextDepartureTime"
-          class="col-fixed text-sm"
-          style="display: block"
-        >
-          次発
-        </label>
-        <Calendar
-          id="next-nextDepartureTime"
-          :timeOnly="true"
-          hourFormat="24"
-          v-model="nextDepartureTime"
-          class="w-10"
-        />
-      </div>
-      <div class="field col-4">
-        <label
-          for="turn-cycle-nextDepartureTime"
-          class="col-fixed text-sm"
-          style="display: block"
-        >
-          折返周期(分)
-        </label>
-        <InputNumber
-          id="turn-cycle-nextDepartureTime"
-          mode="decimal"
-          v-model="turnCycleTime"
-          class="w-10"
-        />
-      </div>
-    </div>
-    <Button label="ふやす" @click="add" :style="buttonColorStyle" />
-    <DiagramTimeTableManagerTable v-model="selectedDiagramDataSetData" />
-  </template>
+      <SplitButton
+        label="ふやす"
+        @click="add"
+        class="p-button-sm my-2"
+        :model="[
+          { label: '別列車からコピー', icon: 'pi pi-copy', command: copyFrom },
+        ]"
+      />
+      <DiagramTimeTableManagerCopyFromOtherTrain
+        v-model:visible="isVisibleCopyModal"
+        :diagramDataSet="selectedDiagramDataSet"
+      />
+      <DiagramTimeTableManagerTable v-model="selectedDiagramDataSetData" />
+    </template>
+  </Panel>
 </template>
 
 <script lang="ts">
@@ -96,10 +114,11 @@ import { useStore } from "@/store";
 import { DATE_FORMAT } from "@/common/const";
 import { stationId } from "@/types";
 import DiagramTimeTableManagerTable from "@/components/DiagramTimeTableManagerTable.vue";
-
+import DiagramTimeTableManagerCopyFromOtherTrain from "@/components/DiagramTimeTableManagerCopyFromOtherTrain.vue";
 export default defineComponent({
   components: {
     DiagramTimeTableManagerTable,
+    DiagramTimeTableManagerCopyFromOtherTrain,
   },
   props: {
     diagramDataSetId: { type: Number, default: undefined },
@@ -111,7 +130,7 @@ export default defineComponent({
     const boundFor = ref<"A" | "B" | "AB" | "BA">("AB");
 
     const store = useStore();
-
+    // データ源泉 =======================================
     const stationList = computed(
       () => store.getters.getShouldRecordTimeStationList
     );
@@ -140,6 +159,7 @@ export default defineComponent({
       },
     });
 
+    // フォーム =======================================
     const startStation = ref<stationId>(
       selectedDiagramDataSetData.value?.length
         ? selectedDiagramDataSetData.value[
@@ -191,6 +211,7 @@ export default defineComponent({
 
     const showingTrainId = computed(() => store.state.showingTrainId);
 
+    // ロジック =======================================
     const add = () => {
       if (!selectedDiagramDataSetData.value) return;
 
@@ -214,6 +235,11 @@ export default defineComponent({
       props.refreshChart && props.refreshChart();
     };
 
+    const isVisibleCopyModal = ref(false);
+    const copyFrom = () => {
+      isVisibleCopyModal.value = true;
+    };
+
     return {
       trainType,
       nextDepartureTime,
@@ -226,6 +252,8 @@ export default defineComponent({
       selectedDiagramDataSet,
       selectedDiagramDataSetData,
       add,
+      isVisibleCopyModal,
+      copyFrom,
     };
   },
 });

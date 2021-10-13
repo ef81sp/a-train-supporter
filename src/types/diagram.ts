@@ -17,3 +17,5 @@ export interface chartJsData {
   labels: string[]; // 駅名の一覧が入る
   datasets: chartJsDataSet[];
 }
+
+export type offsetDirectionCode = 'forward' | 'back';

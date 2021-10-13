@@ -10,6 +10,7 @@ import {
   roundMinute,
   generateChartData,
   generateInitialNecessaryTime,
+  offsetDiagramDatas,
 } from './diagram';
 
 describe('roundMinute', () => {
@@ -354,5 +355,33 @@ describe('generateInitialNecessaryTime', () => {
   it('bound for B', () => {
     const result = generateInitialNecessaryTime(stationList, 'B');
     expect(result).toEqual<NecessaryTimeMap>(expectedNecessaryTimesB);
+  });
+});
+
+describe('offsetDiagramDatas', () => {
+  const data: DiagramData[] = [
+    { stationId: 1, time: '2021-10-14 06:00', name: '1' },
+    { stationId: 2, time: '2021-10-14 06:15', name: '2' },
+    { stationId: 3, time: '2021-10-14 23:55', name: '3' },
+  ];
+  it('forward', () => {
+    const result = offsetDiagramDatas(data, 30, 'forward');
+    expect(result).toEqual([
+      { stationId: 1, time: '2021-10-14 06:30', name: '1' },
+      { stationId: 2, time: '2021-10-14 06:45', name: '2' },
+      { stationId: 3, time: '2021-10-15 00:25', name: '3' },
+    ]);
+  });
+  it('back', () => {
+    const result = offsetDiagramDatas(data, 30, 'back');
+    expect(result).toEqual([
+      { stationId: 1, time: '2021-10-14 05:30', name: '1' },
+      { stationId: 2, time: '2021-10-14 05:45', name: '2' },
+      { stationId: 3, time: '2021-10-14 23:25', name: '3' },
+    ]);
+  });
+  it('no offset', () => {
+    const result = offsetDiagramDatas(data, 0, 'forward');
+    expect(result).toEqual(data);
   });
 });

@@ -82,18 +82,24 @@ const mockState: State = {
         lineColor: LINE_COLORS[0].value,
       },
     ],
-    // [
-    //   2,
-    //   {
-    //     id: 2,
-    //     name: '普通',
-    //     necessaryTimesA: new Map(),
-    //     necessaryTimesB: new Map(),
-    //     stoppingStationList: ['上野', '北千住', '松戸', '柏'],
-    //     trainIdList: [],
-    //     lineColor: '22FF22',
-    //   },
-    // ],
+    [
+      2,
+      {
+        id: 2,
+        name: '普通',
+        necessaryTimesA: new Map<string, NecessaryTime>([
+          ['1-6', { from: 1, to: 6, necessaryTime: 17, id: '1-6' }],
+          ['6-7', { from: 6, to: 7, necessaryTime: 4, id: '6-7' }],
+        ]),
+        necessaryTimesB: new Map<string, NecessaryTime>([
+          ['7-6', { from: 7, to: 6, necessaryTime: 4, id: '7-6' }],
+          ['6-1', { from: 6, to: 1, necessaryTime: 17, id: '6-1' }],
+        ]),
+        stoppingStationList: [1, 5, 6, 7],
+        trainIdList: [2],
+        lineColor: LINE_COLORS[5].value,
+      },
+    ],
   ]),
   diagramData: {
     labels: ['上野', '北千住', '松戸', '柏'],
@@ -111,10 +117,23 @@ const mockState: State = {
         ],
         borderColor: LINE_COLORS[0].value,
       },
+      {
+        label: '普通-1',
+        id: 2,
+        data: [
+          { time: '2021-10-14 04:30', stationId: 1 },
+          { time: '2021-10-14 04:47', stationId: 6 },
+          { time: '2021-10-14 04:51', stationId: 7 },
+          { time: '2021-10-14 05:01', stationId: 7 },
+          { time: '2021-10-14 05:05', stationId: 6 },
+          { time: '2021-10-14 05:22', stationId: 1 },
+        ],
+        borderColor: LINE_COLORS[5].value,
+      },
     ],
   },
   showingTrainId: 1,
-  nextTrainId: 2,
+  nextTrainId: 3,
   __chartRefresh: () => void 0,
   __saveId: 1,
 };

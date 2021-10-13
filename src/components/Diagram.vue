@@ -37,12 +37,10 @@
       </Panel>
     </div>
     <div class="col">
-      <Panel header="時刻" class="my-2">
-        <DiagramTimeTableManager
-          :diagramDataSetId="showingTrainId"
-          :refreshChart="chartRef?.refresh"
-        />
-      </Panel>
+      <DiagramTimeTableManager
+        :diagramDataSetId="showingTrainId"
+        :refreshChart="chartRef?.refresh"
+      />
     </div>
   </div>
 </template>
