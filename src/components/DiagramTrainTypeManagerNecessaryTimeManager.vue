@@ -80,17 +80,17 @@
       <div>
         <div class="grid my-2">
           <MeasureNecessaryTimeRunningButton
-            @click="onClickRunning"
+            :onClickRunning="onClickRunning"
+            :onClickPassing="onClickPassing"
             :isRunning="isRunning"
+            :isPass="
+              !trainType.stoppingStationList.includes(
+                nowStationInfo.nextStation
+              )
+            "
+            :disabled="nowStationInfo.finish"
             class="col mx-1"
           />
-          <Button
-            class="p-button-info col mx-1 flex justify-content-center"
-            @click="onClickPassing"
-            :disabled="!isRunning"
-          >
-            <span class="pi pi-fast-forward mx-1" />通過
-          </Button>
         </div>
         <div class="grid my-2">
           <Button
