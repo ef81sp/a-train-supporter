@@ -19,7 +19,7 @@
           <Dropdown
             id="startStation"
             v-model="startStation"
-            :options="stationList"
+            :options="shouldRecordTimeStoppingStationList"
             optionLabel="name"
             optionValue="id"
             class="w-10 text-left"
@@ -36,7 +36,7 @@
           <Dropdown
             id="endStation"
             v-model="endStation"
-            :options="stationList"
+            :options="shouldRecordTimeStoppingStationList"
             optionLabel="name"
             optionValue="id"
             class="w-10 text-left"
@@ -53,7 +53,10 @@
           <Dropdown
             id="boundFor"
             v-model="boundFor"
-            :options="['A', 'B', 'AB', 'BA']"
+            :options="boundForOptions"
+            optionLabel="key"
+            optionValue="key"
+            optionDisabled="disabled"
             class="w-10 text-left"
           />
         </div>
@@ -84,6 +87,7 @@
           <InputNumber
             id="turn-cycle-nextDepartureTime"
             mode="decimal"
+            :min="1"
             v-model="turnCycleTime"
             class="w-10"
           />
@@ -115,6 +119,7 @@ import { DATE_FORMAT } from "@/common/const";
 import { stationId } from "@/types";
 import DiagramTimeTableManagerTable from "@/components/DiagramTimeTableManagerTable.vue";
 import DiagramTimeTableManagerCopyFromOtherTrain from "@/components/DiagramTimeTableManagerCopyFromOtherTrain.vue";
+import { DiagramData } from "@/types/diagram";
 export default defineComponent({
   components: {
     DiagramTimeTableManagerTable,
@@ -127,12 +132,21 @@ export default defineComponent({
   setup(props) {
     const nextDepartureTime = ref();
     const turnCycleTime = ref<number>(30);
-    const boundFor = ref<"A" | "B" | "AB" | "BA">("AB");
+    const boundForOptions = ref([
+      { key: "A", disabled: false },
+      { key: "B", disabled: false },
+      { key: "AB", disabled: false },
+      { key: "BA", disabled: false },
+    ]);
+    const boundFor = ref<"A" | "B" | "AB" | "BA">("A");
 
     const store = useStore();
     // データ源泉 =======================================
-    const stationList = computed(
-      () => store.getters.getShouldRecordTimeStationList
+    const stationList = computed(() => store.state.stationList);
+    const shouldRecordTimeStoppingStationList = computed(() =>
+      store.getters.getShouldRecordTimeStationList.filter((v) =>
+        trainType.value?.stoppingStationList.includes(v.id)
+      )
     );
     const trainType = computed(() =>
       store.getters.getTrainTypeByTrainId(props.diagramDataSetId || 0)
@@ -165,10 +179,12 @@ export default defineComponent({
         ? selectedDiagramDataSetData.value[
             selectedDiagramDataSetData.value.length - 1
           ].stationId
-        : stationList.value[0].id
+        : shouldRecordTimeStoppingStationList.value[0].id
     );
     const endStation = ref<stationId>(
-      stationList.value[stationList.value.length - 1].id
+      shouldRecordTimeStoppingStationList.value[
+        shouldRecordTimeStoppingStationList.value.length - 1
+      ].id
     );
 
     const latestDataOnTheList = computed(() =>
@@ -191,14 +207,48 @@ export default defineComponent({
         ).toDate()
       : dayjs("2021-10-14 04:30:00").toDate();
 
-    watch(latestDataOnTheList, (newData) => {
+    const __updateWithLataestDataOnTheList = (newData?: DiagramData) => {
       if (!newData) return;
       nextDepartureTime.value = dayjs(
         roundMinute(newData.time, turnCycleTime.value),
         DATE_FORMAT
       ).toDate();
-      startStation.value = newData.stationId;
-      endStation.value = newData.stationId;
+
+      [startStation.value, endStation.value] = [
+        newData.stationId,
+        startStation.value,
+      ];
+      switch (boundFor.value) {
+        case "A":
+          boundFor.value = "B";
+          break;
+        case "B":
+          boundFor.value = "A";
+          break;
+        case "AB":
+        case "BA":
+        default:
+          break;
+      }
+    };
+    // initialize
+    watch(
+      () => props.diagramDataSetId,
+      () => {
+        if (latestDataOnTheList.value) {
+          __updateWithLataestDataOnTheList(latestDataOnTheList.value);
+        } else {
+          startStation.value = stationList.value.startingStationId;
+          endStation.value = stationList.value.endingStationId;
+          nextDepartureTime.value = dayjs(
+            "2021-10-14 04:30",
+            DATE_FORMAT
+          ).toDate();
+        }
+      }
+    );
+    watch(latestDataOnTheList, (newData) => {
+      __updateWithLataestDataOnTheList(newData);
     });
     watch(turnCycleTime, (newCycleTime) => {
       if (!newCycleTime) return;
@@ -208,7 +258,93 @@ export default defineComponent({
         DATE_FORMAT
       ).toDate();
     });
+    watch(startStation, (newStartStation) => {
+      switch (newStartStation) {
+        case stationList.value.startingStationId: {
+          boundForOptions.value.forEach((v) => {
+            if (v.key[0] !== "A") {
+              v.disabled = true;
+            } else {
+              v.disabled = false;
+            }
+          });
+          if (boundFor.value.length >= 2) {
+            boundFor.value = "AB";
+          } else {
+            boundFor.value = "A";
+          }
+          break;
+        }
+        case stationList.value.endingStationId: {
+          boundForOptions.value.forEach((v) => {
+            if (v.key[0] !== "B") {
+              v.disabled = true;
+            } else {
+              v.disabled = false;
+            }
+          });
+          if (boundFor.value.length >= 2) {
+            boundFor.value = "BA";
+          } else {
+            boundFor.value = "B";
+          }
+          break;
+        }
+        default:
+          boundForOptions.value.forEach((v) => {
+            if (v.key[0] !== "A") {
+              v.disabled = false;
+            }
+          });
+          break;
+      }
+    });
+    watch(endStation, (newEndStation) => {
+      if (newEndStation === startStation.value) {
+        switch (startStation.value) {
+          case stationList.value.startingStationId:
+            boundFor.value = "AB";
+            break;
+          case stationList.value.endingStationId:
+            boundFor.value = "BA";
+            break;
+          default:
+        }
+      } else if (
+        newEndStation === stationList.value.startingStationId ||
+        newEndStation === stationList.value.endingStationId
+      ) {
+        switch (startStation.value) {
+          case stationList.value.startingStationId:
+            boundFor.value = "A";
+            break;
+          case stationList.value.endingStationId:
+            boundFor.value = "B";
+            break;
+          default:
+        }
+      }
+    });
+    watch(boundFor, (newBoundFor, oldBoundFor) => {
+      if (
+        endStation.value !== stationList.value.startingStationId &&
+        endStation.value !== stationList.value.endingStationId
+      ) {
+        return;
+      }
 
+      if (newBoundFor.length === 2 && oldBoundFor.length === 1) {
+        endStation.value = startStation.value;
+      }
+      if (newBoundFor.length === 1 && oldBoundFor.length === 2) {
+        if (startStation.value === stationList.value.startingStationId) {
+          endStation.value = stationList.value.endingStationId;
+        }
+        if (startStation.value === stationList.value.endingStationId) {
+          endStation.value = stationList.value.startingStationId;
+        }
+      }
+    });
     const showingTrainId = computed(() => store.state.showingTrainId);
 
     // ロジック =======================================
@@ -246,8 +382,9 @@ export default defineComponent({
       turnCycleTime,
       startStation,
       endStation,
-      stationList,
+      shouldRecordTimeStoppingStationList,
       buttonColorStyle,
+      boundForOptions,
       boundFor,
       selectedDiagramDataSet,
       selectedDiagramDataSetData,
