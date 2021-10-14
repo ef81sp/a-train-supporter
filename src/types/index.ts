@@ -26,7 +26,7 @@ export interface NecessaryTime {
   necessaryTime: number;
 }
 
-export type NecessaryTimeMap = Map<String, NecessaryTime>;
+export type NecessaryTimeMap = Map<string, NecessaryTime>;
 
 export interface TrainType {
   id: number;

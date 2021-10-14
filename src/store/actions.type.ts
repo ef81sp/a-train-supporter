@@ -1,8 +1,8 @@
-import { NecessaryTimeMap, Station, TrainType } from '@/types';
-import { DiagramData } from '@/types/diagram';
-import { ActionContext } from 'vuex';
-import { State } from '.';
-import { MyCommit } from './mutations.type';
+import { NecessaryTimeMap, Station, TrainType } from "@/types";
+import { DiagramData } from "@/types/diagram";
+import { ActionContext } from "vuex";
+import { State } from ".";
+import { MyCommit } from "./mutations.type";
 
 interface MyActionContext extends ActionContext<State, State> {
   commit: MyCommit;
@@ -12,7 +12,7 @@ interface ActionPayload {
   updateStationList: Station[];
   updateTrainTypeNecessaryTimeTable: {
     trainTypeId: number;
-    boundFor: 'A' | 'B';
+    boundFor: "A" | "B";
     newNecessaryTimeMap: NecessaryTimeMap;
   };
   updateDiagramData: { id: number; data: DiagramData[] };
@@ -29,8 +29,8 @@ export interface MyDispatch {
   <T extends keyof ActionPayload>(
     type: T,
     payload: ActionPayload[T]
-  ): Promise<any>;
-  <T extends keyof NoPayloadAction>(type: T): Promise<any>;
+  ): Promise<void>;
+  <T extends keyof NoPayloadAction>(type: T): Promise<void>;
 }
 
 type MyActionsWithPayload = {

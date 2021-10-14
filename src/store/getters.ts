@@ -1,7 +1,7 @@
-import { DATE_FORMAT } from '@/common/const';
-import dayjs from 'dayjs';
-import rfdc from 'rfdc';
-import { MyGettersFunctions } from './getters.type';
+import { DATE_FORMAT } from "@/common/const";
+import dayjs from "dayjs";
+import rfdc from "rfdc";
+import { MyGettersFunctions } from "./getters.type";
 const clone = rfdc();
 
 export const getters: MyGettersFunctions = {
@@ -41,7 +41,7 @@ export const getters: MyGettersFunctions = {
         if (idx === 0) {
           return { min: cur.data[0].time, max: cur.data[lastItemIdx].time };
         }
-        if (prev.min === '' && prev.max === '') {
+        if (prev.min === "" && prev.max === "") {
           return {
             min: cur.data[0].time,
             max: cur.data[lastItemIdx].time,
@@ -60,14 +60,14 @@ export const getters: MyGettersFunctions = {
             : prev.max,
         };
       },
-      { min: '', max: '' }
+      { min: "", max: "" }
     );
 
     result.min = dayjs(result.min, DATE_FORMAT)
-      .subtract(15, 'minute')
+      .subtract(15, "minute")
       .format(DATE_FORMAT);
     result.max = dayjs(result.max, DATE_FORMAT)
-      .add(15, 'minute')
+      .add(15, "minute")
       .format(DATE_FORMAT);
     return result;
   },

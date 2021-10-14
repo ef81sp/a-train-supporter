@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import "chartjs-adapter-date-fns";
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useStore } from "@/store";
 
 import { formatDdHhmmToHhmm } from "@/logics/diagram";

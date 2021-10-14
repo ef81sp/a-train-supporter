@@ -1,17 +1,17 @@
-import { DATE_FORMAT } from '@/common/const';
+import { DATE_FORMAT } from "@/common/const";
 import {
   generateInitialNecessaryTime,
   getRandomLineColor,
-} from '@/logics/diagram';
-import { TrainType } from '@/types';
-import { DiagramData } from '@/types/diagram';
-import dayjs from 'dayjs';
-import { initialState, State } from '.';
-import equal from 'fast-deep-equal/es6';
+} from "@/logics/diagram";
+import { TrainType } from "@/types";
+import { DiagramData } from "@/types/diagram";
+import dayjs from "dayjs";
+import { initialState, State } from ".";
+import equal from "fast-deep-equal/es6";
 
-import rfdc from 'rfdc';
-import { jsonParse, jsonStringify } from '@/common/util';
-import { MyMutation } from './mutations.type';
+import rfdc from "rfdc";
+import { jsonParse, jsonStringify } from "@/common/util";
+import { MyMutation } from "./mutations.type";
 const clone = rfdc();
 
 const mergeState = (state: State, newState: State) => {
@@ -38,7 +38,7 @@ const mergeState = (state: State, newState: State) => {
   }
 };
 
-export * from './mutations.type';
+export * from "./mutations.type";
 
 export const mutations: MyMutation = {
   updateStationList: (state, stations) => {
@@ -56,7 +56,7 @@ export const mutations: MyMutation = {
   ) {
     const target = state.trainTypes.get(trainTypeId);
     if (!target) return;
-    if (boundFor === 'A') {
+    if (boundFor === "A") {
       target.necessaryTimesA = newNecessaryTimeMap;
     } else {
       target.necessaryTimesB = newNecessaryTimeMap;
@@ -88,8 +88,8 @@ export const mutations: MyMutation = {
       name: `種別${newKey}`,
       trainIdList: [],
       stoppingStationList: state.stationList.stations.map((v) => v.id),
-      necessaryTimesA: generateInitialNecessaryTime(state.stationList, 'A'),
-      necessaryTimesB: generateInitialNecessaryTime(state.stationList, 'B'),
+      necessaryTimesA: generateInitialNecessaryTime(state.stationList, "A"),
+      necessaryTimesB: generateInitialNecessaryTime(state.stationList, "B"),
       lineColor: getRandomLineColor(state.trainTypes).value,
     };
     state.trainTypes.set(newKey, newTrainType);

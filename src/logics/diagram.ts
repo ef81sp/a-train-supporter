@@ -1,4 +1,4 @@
-import { DATE_FORMAT, LINE_COLORS } from '@/common/const';
+import { DATE_FORMAT, LINE_COLORS } from "@/common/const";
 import {
   NecessaryTime,
   NecessaryTimeMap,
@@ -7,20 +7,20 @@ import {
   TerminalStation,
   TrainType,
   TrainTypeMap,
-} from '@/types';
-import { DiagramData, offsetDirectionCode } from '@/types/diagram';
-import dayjs from 'dayjs';
-import rfdc from 'rfdc';
+} from "@/types";
+import { DiagramData, offsetDirectionCode } from "@/types/diagram";
+import dayjs from "dayjs";
+import rfdc from "rfdc";
 
 const clonedeep = rfdc();
 
-export const formatDdHhmmToHhmm = (time: string) => {
-  return dayjs(time, DATE_FORMAT).format('HH:mm');
+export const formatDdHhmmToHhmm = (time: string): string => {
+  return dayjs(time, DATE_FORMAT).format("HH:mm");
 };
 
-export const addMinute = (time: string, addingMinutes: number) => {
+export const addMinute = (time: string, addingMinutes: number): string => {
   return dayjs(time, DATE_FORMAT)
-    .add(addingMinutes, 'minute')
+    .add(addingMinutes, "minute")
     .format(DATE_FORMAT);
 };
 
@@ -29,7 +29,7 @@ export const roundMinute = (
   targetUnitMinutes: number
 ): string => {
   const parsedTime = dayjs(time, DATE_FORMAT);
-  const parsedMinute = parsedTime.get('minute');
+  const parsedMinute = parsedTime.get("minute");
   const __targetUnitMinutes = targetUnitMinutes === 0 ? 60 : targetUnitMinutes;
   let targetMinute = __targetUnitMinutes;
   while (parsedMinute >= targetMinute) {
@@ -52,9 +52,9 @@ export const generateChartData = ({
   startStation: stationId;
   endStation: stationId;
   turnCycleTime?: number;
-  boundFor: 'A' | 'B' | 'AB' | 'BA';
+  boundFor: "A" | "B" | "AB" | "BA";
   terminalStation: TerminalStation;
-}) => {
+}): DiagramData[] => {
   let currentTime: string = startTime;
   const result: DiagramData[] = [{ stationId: startStation, time: startTime }];
   enum ROUND_TRIP_STATUS {
@@ -112,15 +112,15 @@ export const generateChartData = ({
   };
 
   switch (boundFor) {
-    case 'A': {
+    case "A": {
       loopNecessaryTimes(trainType.necessaryTimesA, ROUND_TRIP_STATUS.ONE_WAY);
       break;
     }
-    case 'B': {
+    case "B": {
       loopNecessaryTimes(trainType.necessaryTimesB, ROUND_TRIP_STATUS.ONE_WAY);
       break;
     }
-    case 'AB': {
+    case "AB": {
       loopNecessaryTimes(
         trainType.necessaryTimesA,
         ROUND_TRIP_STATUS.ROUND_TRIP_OUTWARD
@@ -131,7 +131,7 @@ export const generateChartData = ({
       );
       break;
     }
-    case 'BA': {
+    case "BA": {
       loopNecessaryTimes(
         trainType.necessaryTimesB,
         ROUND_TRIP_STATUS.ROUND_TRIP_OUTWARD
@@ -149,11 +149,11 @@ export const generateChartData = ({
 
 export const generateInitialNecessaryTime = (
   stationList: StationList,
-  boundFor: 'A' | 'B'
+  boundFor: "A" | "B"
 ): NecessaryTimeMap => {
   const result: NecessaryTimeMap = new Map();
   const list = clonedeep(stationList.stations);
-  if (boundFor === 'B') {
+  if (boundFor === "B") {
     list.reverse();
   }
   let previousStationId: stationId = list[0]?.id;
@@ -173,7 +173,9 @@ export const generateInitialNecessaryTime = (
   return result;
 };
 
-export const getRandomLineColor = (trainTypes: TrainTypeMap) => {
+export const getRandomLineColor = (
+  trainTypes: TrainTypeMap
+): { label: string; value: string } => {
   const usedColors = [...trainTypes.values()].map(
     (trainType) => trainType.lineColor
   );
@@ -190,7 +192,7 @@ export const offsetDiagramDatas = (
     return clonedeep(diagramDatas);
   }
   let sign = 1;
-  if (direction === 'forward') {
+  if (direction === "forward") {
     sign = 1;
   } else {
     sign = -1;
@@ -200,7 +202,7 @@ export const offsetDiagramDatas = (
     const result: DiagramData = {
       stationId: data.stationId,
       time: dayjs(data.time, DATE_FORMAT)
-        .add(_offset, 'minute')
+        .add(_offset, "minute")
         .format(DATE_FORMAT),
     };
     if (data.name) {

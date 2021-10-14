@@ -1,4 +1,4 @@
-import { stationId } from '@/types';
+import { stationId } from "@/types";
 
 export interface DiagramData {
   time: string;
@@ -18,4 +18,4 @@ export interface chartJsData {
   datasets: chartJsDataSet[];
 }
 
-export type offsetDirectionCode = 'forward' | 'back';
+export type offsetDirectionCode = "forward" | "back";

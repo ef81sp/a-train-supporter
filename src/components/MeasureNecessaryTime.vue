@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import MeasureNecessaryTimeRunningButton from "./MeasureNecessaryTimeRunningButton.vue";
 import { MULTIPLYERS, FAST_FORWARDS } from "@/common/const";
 import Timer from "@/logics/Timer";

@@ -80,11 +80,9 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from "vue";
-import rfdc from "rfdc";
 import { useStore } from "@/store";
 import { chartJsDataSet, offsetDirectionCode } from "@/types/diagram";
 import { formatDdHhmmToHhmm, offsetDiagramDatas } from "@/logics/diagram";
-const clone = rfdc();
 
 export default defineComponent({
   props: {

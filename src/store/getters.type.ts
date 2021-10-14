@@ -1,6 +1,6 @@
-import { Station, stationId, TerminalStation, TrainType } from '@/types';
-import { chartJsData, chartJsDataSet } from '@/types/diagram';
-import { State } from '.';
+import { Station, stationId, TerminalStation, TrainType } from "@/types";
+import { chartJsData, chartJsDataSet } from "@/types/diagram";
+import { State } from ".";
 
 export interface MyGetters {
   getShouldRecordTimeStationList: Station[];
