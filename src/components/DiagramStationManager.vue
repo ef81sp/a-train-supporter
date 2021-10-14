@@ -70,10 +70,10 @@ export default defineComponent({
       store.dispatch(
         "updateStationList",
         stationList.value.stations.concat({
-          id: Math.max(...stationList.value.stations.map((v) => v.id)) + 1, //FIXME
+          id: Math.max(...stationList.value.stations.map((v) => v.id), 0) + 1, //FIXME
           name:
             newStationName.value || String(stationList.value.stations.length),
-          shouldRecordTime: false,
+          shouldRecordTime: true,
         })
       );
       newStationName.value = "";

@@ -139,9 +139,9 @@ const mockState: State = {
 };
 
 export default createStore<State>({
-  state: Object.assign(clonedeep(mockState), {
+  state: Object.assign(clonedeep(initialState), {
     __history: {
-      stack: [mockState],
+      stack: [initialState],
       nowIndex: 0,
     },
   }),

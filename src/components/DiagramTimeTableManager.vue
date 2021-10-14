@@ -179,12 +179,12 @@ export default defineComponent({
         ? selectedDiagramDataSetData.value[
             selectedDiagramDataSetData.value.length - 1
           ].stationId
-        : shouldRecordTimeStoppingStationList.value[0].id
+        : shouldRecordTimeStoppingStationList.value[0]?.id
     );
     const endStation = ref<stationId>(
       shouldRecordTimeStoppingStationList.value[
         shouldRecordTimeStoppingStationList.value.length - 1
-      ].id
+      ]?.id
     );
 
     const latestDataOnTheList = computed(() =>
