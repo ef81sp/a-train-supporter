@@ -141,7 +141,7 @@ export const initialState: State = {
 export default createStore<State>({
   state: Object.assign(clonedeep(initialState), {
     __history: {
-      stack: [initialState],
+      stack: [],
       nowIndex: 0,
     },
   }),

@@ -15,13 +15,14 @@ import { MyMutation } from "./mutations.type";
 const clone = rfdc();
 
 const mergeState = (state: State, newState: State) => {
+  const copyState = clone(newState);
   if (state.__history) {
     Object.assign(
       state,
       Object.assign(newState, {
         __history: {
-          stack: state.__history.stack,
-          nowIndex: state.__history.nowIndex - 1,
+          stack: state.__history.stack.concat(copyState),
+          nowIndex: state.__history.nowIndex,
         },
       })
     );
