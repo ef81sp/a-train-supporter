@@ -147,6 +147,7 @@ export default defineComponent({
     onMounted(() => {
       if (!chartRef.value) return;
       store.commit("setChartRefresh", { chartRefresh: chartRef.value.refresh });
+      store.dispatch("loadData", { id: 1 });
     });
 
     return {

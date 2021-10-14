@@ -46,6 +46,7 @@ export const initialState: State = {
   showingTrainId: 0,
   nextTrainId: 1,
   __chartRefresh: () => void 0,
+  __saveId: 1,
 };
 
 // const mockState: State = {
