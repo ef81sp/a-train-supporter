@@ -46,6 +46,8 @@ import { useStore } from "@/store";
 import { stationId } from "@/types";
 import { formatDdHhmmToHhmm } from "@/logics/diagram";
 import rfdc from "rfdc";
+import { DATE_FORMAT } from "@/common/const";
+import dayjs from "dayjs";
 
 const clonedeep = rfdc();
 
@@ -73,7 +75,16 @@ export default defineComponent({
         copy.value = clonedeep(props.modelValue);
       }
     );
-    const onCellEditComplete = () => {
+    const onCellEditComplete = (e: { data: DiagramData; index: number }) => {
+      const from = dayjs(props.modelValue[e.index].time, DATE_FORMAT);
+      const to = dayjs(e.data.time, DATE_FORMAT);
+      const offset = to.diff(from, "minutes");
+      copy.value.forEach((v, idx) => {
+        if (idx <= e.index) return;
+        v.time = dayjs(v.time, DATE_FORMAT)
+          .add(offset, "minutes")
+          .format(DATE_FORMAT);
+      });
       context.emit("update:modelValue", copy.value);
     };
     const onChangeCheckbox = (index: number, value: boolean) => {
