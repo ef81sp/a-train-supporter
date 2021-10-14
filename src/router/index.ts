@@ -1,11 +1,15 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import Home from '../views/Home.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    name: 'Home',
     component: Home,
+    meta: {
+      title: 'DiaGen | ダイヤグラム作成サポートツール',
+      desc: '鉄道運営シミュレーター向けダイヤグラム作成サポートツール',
+    },
   },
   // {
   //   path: "/about",
