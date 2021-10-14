@@ -1,21 +1,23 @@
 <template>
-  <DiagramMenuDataSaveManager />
-  <Button
-    label="戻る"
-    icon="pi pi-angle-left"
-    class="mx-1"
-    :disabled="!canUndo"
-    @click="handleUndo"
-  />
+  <div>
+    <DiagramMenuDataSaveManager />
+    <Button
+      label="戻る"
+      icon="pi pi-angle-left"
+      class="mx-1"
+      :disabled="!canUndo"
+      @click="handleUndo"
+    />
 
-  <Button
-    label="進む"
-    icon="pi pi-angle-right"
-    class="mx-1"
-    :disabled="!canRedo"
-    @click="handleRedo"
-  />
-  <Button label="ヘルプ" icon="pi pi-question-circle" class="mx-1" />
+    <Button
+      label="進む"
+      icon="pi pi-angle-right"
+      class="mx-1"
+      :disabled="!canRedo"
+      @click="handleRedo"
+    />
+    <Button label="ヘルプ" icon="pi pi-question-circle" class="mx-1" />
+  </div>
 </template>
 <script lang="ts">
 import DiagramMenuDataSaveManager from "./DiagramMenuDataSaveManager.vue";
