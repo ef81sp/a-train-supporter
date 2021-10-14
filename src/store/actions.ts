@@ -1,4 +1,7 @@
 import { MyActions } from "./actions.type";
+import rfdc from "rfdc";
+import { generateInitialNecessaryTime } from "@/logics/diagram";
+const clone = rfdc();
 
 export const actions: MyActions = {
   addTrain(context, { trainTypeId }) {
@@ -31,6 +34,24 @@ export const actions: MyActions = {
   },
   updateStationList(context, payload) {
     context.commit("updateStationList", payload);
+    context.state.trainTypes.forEach((trainType, id) => {
+      const data = clone(trainType);
+      const a = generateInitialNecessaryTime(context.state.stationList, "A");
+      a.forEach((v, k) => {
+        const time = trainType.necessaryTimesA.get(k)?.necessaryTime;
+        if (!time) return;
+        v.necessaryTime = time;
+      });
+      data.necessaryTimesA = a;
+      const b = generateInitialNecessaryTime(context.state.stationList, "B");
+      b.forEach((v, k) => {
+        const time = trainType.necessaryTimesB.get(k)?.necessaryTime;
+        if (!time) return;
+        v.necessaryTime = time;
+      });
+      data.necessaryTimesB = b;
+      context.commit("updateTrainType", { id, data });
+    });
     context.commit("__logHistory");
   },
   loadData(context, payload) {
