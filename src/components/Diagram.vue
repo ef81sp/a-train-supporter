@@ -1,7 +1,7 @@
 <template>
   <div class="grid p-1">
     <div class="col-12 flex justify-content-between">
-      <h1 class="text-base">DiaGen</h1>
+      <h1 class="text-lg mb-0">DiaGen</h1>
       <DiagramMenu />
     </div>
     <div class="col-12">
