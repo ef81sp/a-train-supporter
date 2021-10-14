@@ -98,6 +98,7 @@ export const mutations: MyMutation = {
     state.trainTypes.set(id, data);
   },
   addTrain(state, { trainTypeId, trainId }) {
+    console.log(trainTypeId, trainId);
     const trainType = state.trainTypes.get(trainTypeId);
     if (!trainType) return;
 
@@ -116,6 +117,7 @@ export const mutations: MyMutation = {
       if (b.data.length === 0 && a.data.length !== 0) return -1;
       return 1;
     });
+    state.showingTrainId = trainId;
   },
   incrementTrainId(state) {
     state.nextTrainId++;

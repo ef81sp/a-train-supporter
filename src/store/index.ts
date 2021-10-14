@@ -44,8 +44,8 @@ export const initialState: State = {
     labels: [],
     datasets: [],
   },
-  showingTrainId: 1,
-  nextTrainId: 2,
+  showingTrainId: 0,
+  nextTrainId: 1,
   __chartRefresh: () => void 0,
 };
 

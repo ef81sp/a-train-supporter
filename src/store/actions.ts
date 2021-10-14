@@ -10,7 +10,7 @@ export const actions: MyActions = {
   addInitialTrainType(context) {
     context.commit('addInitialTrainType');
     const newTrainTypeId = Math.max(...context.state.trainTypes.keys());
-    context.dispatch('addTrain', newTrainTypeId);
+    context.dispatch('addTrain', { trainTypeId: newTrainTypeId });
     // context.commit('__logHistory'); // addTrain側でやるので省略
   },
   updateTrainType(context, payload) {
