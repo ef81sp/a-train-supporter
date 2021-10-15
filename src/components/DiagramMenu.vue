@@ -16,7 +16,18 @@
       :disabled="!canRedo"
       @click="handleRedo"
     />
-    <Button label="ヘルプ" icon="pi pi-question-circle" class="mx-1" />
+    <SplitButton
+      label="ヘルプ"
+      icon="pi pi-question-circle"
+      class="mx-1"
+      :model="[
+        {
+          label: '状態の初期化',
+          icon: 'pi pi-ban',
+          command: handleInitialize,
+        },
+      ]"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -46,12 +57,16 @@ export default defineComponent({
     const handleRedo = () => {
       store.commit("redo");
     };
+    const handleInitialize = () => {
+      store.commit("initialize");
+    };
 
     return {
       canUndo,
       canRedo,
       handleUndo,
       handleRedo,
+      handleInitialize,
     };
   },
 });

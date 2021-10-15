@@ -1,12 +1,12 @@
-import { NecessaryTimeMap, Station, TrainType } from "@/types";
-import { DiagramData } from "@/types/diagram";
-import { State } from ".";
+import { NecessaryTimeMap, Station, TrainType } from '@/types';
+import { DiagramData } from '@/types/diagram';
+import { State } from '.';
 
 interface MutationPayload {
   updateStationList: Station[];
   updateTrainTypeNecessaryTimeTable: {
     trainTypeId: number;
-    boundFor: "A" | "B";
+    boundFor: 'A' | 'B';
     newNecessaryTimeMap: NecessaryTimeMap;
   };
   updateDiagramData: { id: number; data: DiagramData[] };
@@ -23,6 +23,7 @@ interface NoPayloadMutation {
   addInitialTrainType: void;
   incrementTrainId: void;
   __logHistory: void;
+  initialize: void;
   undo: void;
   redo: void;
 }
