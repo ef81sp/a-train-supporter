@@ -57,4 +57,8 @@ export const actions: MyActions = {
   loadData(context, payload) {
     context.commit("loadData", payload);
   },
+  initialize(context) {
+    context.commit("initialize");
+    context.commit("__logHistory");
+  },
 };

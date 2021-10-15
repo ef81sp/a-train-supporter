@@ -23,6 +23,7 @@ interface ActionPayload {
 
 interface NoPayloadAction {
   addInitialTrainType: void;
+  initialize: void;
 }
 
 export interface MyDispatch {

@@ -58,7 +58,7 @@ export default defineComponent({
       store.commit("redo");
     };
     const handleInitialize = () => {
-      store.commit("initialize");
+      store.dispatch("initialize");
     };
 
     return {
