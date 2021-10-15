@@ -1,11 +1,13 @@
 <template>
-  <div class="p-inputgroup">
-    <InputText
-      placeholder="駅名"
-      v-model="newStationName"
-      @keydown.enter="onEnter($event.keyCode, addStation)"
-    />
-    <Button icon="pi pi-plus" @click="addStation" label="駅追加" />
+  <div class="flex flex-column align-items-center justify-content-center">
+    <div class="p-inputgroup w-3">
+      <InputText
+        placeholder="駅名"
+        v-model="newStationName"
+        @keydown.enter="onEnter($event.keyCode, addStation)"
+      />
+      <Button icon="pi pi-plus" @click="addStation" label="駅追加" />
+    </div>
   </div>
   <p>チェックをつける: 採時駅</p>
   <div class="station-chart">
