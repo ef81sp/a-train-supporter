@@ -136,10 +136,7 @@ export default defineComponent({
 
     const showingTrainId = computed(() => store.state.showingTrainId);
 
-    const canAddTrainType = computed<boolean>(
-      () =>
-        trainTypes.value.size < 6 && store.state.stationList.stations.length > 1
-    );
+    const canAddTrainType = computed<boolean>(() => trainTypes.value.size < 6);
     const addInitialTrainType = () => {
       store.dispatch("addInitialTrainType");
     };
