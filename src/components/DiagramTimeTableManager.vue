@@ -130,7 +130,7 @@ export default defineComponent({
     refreshChart: Function,
   },
   setup(props) {
-    const nextDepartureTime = ref();
+    const nextDepartureTime = ref<Date>();
     const turnCycleTime = ref<number>(30);
     const boundForOptions = ref([
       { key: "A", disabled: false },
@@ -353,12 +353,14 @@ export default defineComponent({
 
       if (!trainType.value) return;
 
+      console.log(nextDepartureTime.value);
+
       store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
         data: [
           ...selectedDiagramDataSetData.value,
           ...generateChartData({
-            startTime: nextDepartureTime.value,
+            startTime: dayjs(nextDepartureTime.value).format(DATE_FORMAT),
             trainType: trainType.value,
             startStation: startStation.value,
             endStation: endStation.value,
