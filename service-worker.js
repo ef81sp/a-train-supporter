@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/a-train-supporter/precache-manifest.c9ab301c6f2057300fd415b512d2e1f6.js"
+  "/a-train-supporter/precache-manifest.29224e259bae4599ebb45c1136382fe8.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "a-train-supporter"});
