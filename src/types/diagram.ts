@@ -11,6 +11,7 @@ export interface chartJsDataSet {
   label: string; // 列車名が入る
   data: DiagramData[];
   borderColor: string;
+  borderWidth?: number;
 }
 
 export interface chartJsData {

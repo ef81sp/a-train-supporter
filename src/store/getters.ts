@@ -24,9 +24,10 @@ export const getters: MyGettersFunctions = {
     return (key: number) =>
       [...trainTypes.values()].find((v) => v.trainIdList.includes(key));
   },
-  getChatrJsData({ diagramData }, getters) {
+  getChatrJsData({ diagramData, showingTrainId }, getters) {
     const result = clone(diagramData);
     for (const dataset of result.datasets) {
+      dataset.borderWidth = dataset.id === showingTrainId ? 2 : 1;
       for (const data of dataset.data) {
         data.name = getters.getStation(data.stationId)?.name;
       }
