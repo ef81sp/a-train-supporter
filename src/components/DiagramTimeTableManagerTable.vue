@@ -6,6 +6,7 @@
     @cell-edit-complete="onCellEditComplete"
     scrollHeight="50vh"
     class="p-datatable-sm"
+    :rowClass="rowClass"
   >
     <Column field="station" header="駅">
       <template #body="slotProps">
@@ -122,6 +123,16 @@ export default defineComponent({
       );
       resetCheckbox();
     };
+    const rowClass = (data: DiagramData) => {
+      console.log(data);
+      if (data.stationId === store.state.stationList.startingStationId) {
+        return "bg-cyan-50";
+      }
+      if (data.stationId === store.state.stationList.endingStationId) {
+        return "bg-orange-50";
+      }
+      return null;
+    };
     return {
       getStationName,
       formatDdHhmmToHhmm,
@@ -130,6 +141,7 @@ export default defineComponent({
       checkBoxesForDelete,
       onChangeCheckbox,
       deleteTime,
+      rowClass,
     };
   },
 });
