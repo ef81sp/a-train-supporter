@@ -36,9 +36,10 @@
           <Dropdown
             id="endStation"
             v-model="endStation"
-            :options="shouldRecordTimeStoppingStationList"
+            :options="endStationOptions"
             optionLabel="name"
             optionValue="id"
+            optionDisabled="disabled"
             class="w-10 text-left"
           />
         </div>
@@ -139,8 +140,8 @@ export default defineComponent({
     const boundForOptions = ref([
       { key: "A", disabled: false },
       { key: "B", disabled: false },
-      { key: "AB", disabled: false },
-      { key: "BA", disabled: false },
+      // { key: "AB", disabled: false },
+      // { key: "BA", disabled: false },
     ]);
     const boundFor = ref<"A" | "B" | "AB" | "BA">("A");
 
@@ -190,6 +191,14 @@ export default defineComponent({
         shouldRecordTimeStoppingStationList.value.length - 1
       ]?.id
     );
+    const endStationOptions = computed(() =>
+      shouldRecordTimeStoppingStationList.value.map((v) => {
+        return {
+          ...v,
+          disabled: v.id === startStation.value,
+        };
+      })
+    );
 
     const latestDataOnTheList = computed(() =>
       selectedDiagramDataSetData.value?.length
@@ -220,19 +229,32 @@ export default defineComponent({
 
       [startStation.value, endStation.value] = [
         newData.stationId,
-        startStation.value,
+        calcEndStation(newData),
       ];
       switch (boundFor.value) {
         case "A":
-          boundFor.value = "B";
+          // boundFor.value = "B";
           break;
         case "B":
-          boundFor.value = "A";
+          // boundFor.value = "A";
           break;
         case "AB":
         case "BA":
         default:
           break;
+      }
+      function calcEndStation(newData: DiagramData) {
+        if (newData.stationId === stationList.value.startingStationId) {
+          return stationList.value.endingStationId;
+        } else if (newData.stationId === stationList.value.endingStationId) {
+          return stationList.value.startingStationId;
+        }
+        if (boundFor.value === "A") {
+          return stationList.value.endingStationId;
+        } else if (boundFor.value === "B") {
+          return stationList.value.startingStationId;
+        }
+        return stationList.value.endingStationId;
       }
     };
     // initialize
@@ -272,11 +294,11 @@ export default defineComponent({
               v.disabled = false;
             }
           });
-          if (boundFor.value.length >= 2) {
-            boundFor.value = "AB";
-          } else {
-            boundFor.value = "A";
-          }
+          // if (boundFor.value.length >= 2) {
+          //   boundFor.value = "AB";
+          // } else {
+          boundFor.value = "A";
+          // }
           break;
         }
         case stationList.value.endingStationId: {
@@ -287,11 +309,11 @@ export default defineComponent({
               v.disabled = false;
             }
           });
-          if (boundFor.value.length >= 2) {
-            boundFor.value = "BA";
-          } else {
-            boundFor.value = "B";
-          }
+          // if (boundFor.value.length >= 2) {
+          //   boundFor.value = "BA";
+          // } else {
+          boundFor.value = "B";
+          // }
           break;
         }
         default:
@@ -304,7 +326,7 @@ export default defineComponent({
       }
     });
     watch(endStation, (newEndStation) => {
-      if (newEndStation === startStation.value) {
+      /* if (newEndStation === startStation.value) {
         switch (startStation.value) {
           case stationList.value.startingStationId:
             boundFor.value = "AB";
@@ -314,7 +336,7 @@ export default defineComponent({
             break;
           default:
         }
-      } else if (
+      } else*/ if (
         newEndStation === stationList.value.startingStationId ||
         newEndStation === stationList.value.endingStationId
       ) {
@@ -329,26 +351,26 @@ export default defineComponent({
         }
       }
     });
-    watch(boundFor, (newBoundFor, oldBoundFor) => {
-      if (
-        endStation.value !== stationList.value.startingStationId &&
-        endStation.value !== stationList.value.endingStationId
-      ) {
-        return;
-      }
+    // watch(boundFor, (newBoundFor, oldBoundFor) => {
+    //   if (
+    //     endStation.value !== stationList.value.startingStationId &&
+    //     endStation.value !== stationList.value.endingStationId
+    //   ) {
+    //     return;
+    //   }
 
-      if (newBoundFor.length === 2 && oldBoundFor.length === 1) {
-        endStation.value = startStation.value;
-      }
-      if (newBoundFor.length === 1 && oldBoundFor.length === 2) {
-        if (startStation.value === stationList.value.startingStationId) {
-          endStation.value = stationList.value.endingStationId;
-        }
-        if (startStation.value === stationList.value.endingStationId) {
-          endStation.value = stationList.value.startingStationId;
-        }
-      }
-    });
+    //   if (newBoundFor.length === 2 && oldBoundFor.length === 1) {
+    //     endStation.value = startStation.value;
+    //   }
+    //   if (newBoundFor.length === 1 && oldBoundFor.length === 2) {
+    //     if (startStation.value === stationList.value.startingStationId) {
+    //       endStation.value = stationList.value.endingStationId;
+    //     }
+    //     if (startStation.value === stationList.value.endingStationId) {
+    //       endStation.value = stationList.value.startingStationId;
+    //     }
+    //   }
+    // });
     const showingTrainId = computed(() => store.state.showingTrainId);
 
     // プレビュー
@@ -410,6 +432,7 @@ export default defineComponent({
       turnCycleTime,
       startStation,
       endStation,
+      endStationOptions,
       shouldRecordTimeStoppingStationList,
       buttonColorStyle,
       boundForOptions,
