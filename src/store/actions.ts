@@ -50,6 +50,11 @@ export const actions: MyActions = {
         v.necessaryTime = time;
       });
       data.necessaryTimesB = b;
+      data.stoppingStationList.push(
+        context.state.stationList.stations[
+          context.state.stationList.stations.length - 1
+        ].id
+      );
       context.commit("updateTrainType", { id, data });
     });
     context.commit("__logHistory");

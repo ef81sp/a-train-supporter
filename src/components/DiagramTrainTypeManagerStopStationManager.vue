@@ -35,7 +35,7 @@
 </template>
 <script lang="ts">
 import { TrainType } from "@/types";
-import { computed, defineComponent, PropType, ref } from "vue";
+import { computed, defineComponent, PropType, ref, watch } from "vue";
 import rfdc from "rfdc";
 import { useStore } from "@/store";
 const clonedeep = rfdc();
@@ -51,6 +51,12 @@ export default defineComponent({
     const stationList = computed(() => store.state.stationList.stations);
     const stoppingStationList = ref<number[]>(
       clonedeep(props.trainType.stoppingStationList || [])
+    );
+    watch(
+      () => props.trainType.stoppingStationList,
+      (newList) => {
+        stoppingStationList.value = newList;
+      }
     );
     const localVisible = computed({
       get: () => props.visible,
