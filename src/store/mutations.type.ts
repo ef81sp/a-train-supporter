@@ -17,6 +17,8 @@ interface MutationPayload {
   __updateLineColorAndTrainName: { trainTypeId: number };
   loadData: { id: number };
   setSaveId: { id: number };
+  updateInputtingPreviewDiagramDatas: { data: DiagramData[] };
+  updateIsShowPreview: { value: boolean };
 }
 
 interface NoPayloadMutation {

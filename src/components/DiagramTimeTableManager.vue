@@ -93,6 +93,10 @@
           />
         </div>
       </div>
+      <div>
+        <Checkbox id="isShowPreview" binary v-model="isShowPreview" />
+        <label for="isShowPreview">プレビューを表示する</label>
+      </div>
       <SplitButton
         label="ふやす"
         @click="add"
@@ -347,6 +351,34 @@ export default defineComponent({
     });
     const showingTrainId = computed(() => store.state.showingTrainId);
 
+    const previewData = computed<DiagramData[]>(() => {
+      if (!trainType.value) return [];
+      if (!selectedDiagramDataSet.value) return [];
+
+      return [
+        selectedDiagramDataSet.value?.data[
+          selectedDiagramDataSet.value?.data.length - 1
+        ],
+        ...generateChartData({
+          startTime: dayjs(nextDepartureTime.value).format(DATE_FORMAT),
+          trainType: trainType.value,
+          startStation: startStation.value,
+          endStation: endStation.value,
+          boundFor: boundFor.value,
+          terminalStation: store.getters.getTerminalStation,
+          turnCycleTime: turnCycleTime.value,
+        }),
+      ];
+    });
+    const isShowPreview = computed({
+      get: () => store.state.isShowPreview,
+      set: () => {
+        store.commit("updateIsShowPreview", { value: !isShowPreview.value });
+      },
+    });
+    watch(previewData, (newData) => {
+      store.commit("updateInputtingPreviewDiagramDatas", { data: newData });
+    });
     // ロジック =======================================
     const add = () => {
       if (!selectedDiagramDataSetData.value) return;
@@ -357,18 +389,7 @@ export default defineComponent({
 
       store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
-        data: [
-          ...selectedDiagramDataSetData.value,
-          ...generateChartData({
-            startTime: dayjs(nextDepartureTime.value).format(DATE_FORMAT),
-            trainType: trainType.value,
-            startStation: startStation.value,
-            endStation: endStation.value,
-            boundFor: boundFor.value,
-            terminalStation: store.getters.getTerminalStation,
-            turnCycleTime: turnCycleTime.value,
-          }),
-        ],
+        data: [...selectedDiagramDataSetData.value, ...previewData.value],
       });
       props.refreshChart && props.refreshChart();
     };
@@ -393,6 +414,8 @@ export default defineComponent({
       add,
       isVisibleCopyModal,
       copyFrom,
+      previewData,
+      isShowPreview,
     };
   },
 });

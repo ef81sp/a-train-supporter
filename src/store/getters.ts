@@ -24,7 +24,15 @@ export const getters: MyGettersFunctions = {
     return (key: number) =>
       [...trainTypes.values()].find((v) => v.trainIdList.includes(key));
   },
-  getChatrJsData({ diagramData, showingTrainId }, getters) {
+  getChatrJsData(
+    {
+      diagramData,
+      showingTrainId,
+      inputtingPreviewDiagramDatas,
+      isShowPreview,
+    },
+    getters
+  ) {
     const result = clone(diagramData);
     for (const dataset of result.datasets) {
       dataset.borderWidth = dataset.id === showingTrainId ? 2 : 1;
@@ -32,10 +40,22 @@ export const getters: MyGettersFunctions = {
         data.name = getters.getStation(data.stationId)?.name;
       }
     }
+    if (isShowPreview) {
+      result.datasets.push({
+        id: 9999,
+        data: inputtingPreviewDiagramDatas.map((v) => ({
+          ...v,
+          name: getters.getStation(v.stationId)?.name,
+        })),
+        borderColor: "#BBBB00",
+        label: "プレビュー",
+        borderWidth: 3,
+      });
+    }
     return result;
   },
-  getMinAndMaxTimeOnDiagramData({ diagramData }) {
-    const result = diagramData.datasets.reduce(
+  getMinAndMaxTimeOnDiagramData(_, getters) {
+    const result = getters.getChatrJsData.datasets.reduce(
       (prev, cur, idx) => {
         if (cur.data.length === 0) return prev;
         const lastItemIdx = cur.data.length - 1;

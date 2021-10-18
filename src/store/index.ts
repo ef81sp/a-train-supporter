@@ -1,7 +1,7 @@
 import { StationList, TrainType, TrainTypeMap } from "@/types";
 import { createStore, useStore as baseUseStore, Store } from "vuex";
 import { InjectionKey } from "vue";
-import { chartJsData } from "@/types/diagram";
+import { chartJsData, DiagramData } from "@/types/diagram";
 import rfdc from "rfdc";
 import { getters } from "./getters";
 import { mutations } from "./mutations";
@@ -21,6 +21,8 @@ export interface State {
   __chartRefresh: () => void;
   __history?: { stack: State[]; nowIndex: number };
   __saveId?: number;
+  inputtingPreviewDiagramDatas: DiagramData[];
+  isShowPreview: boolean;
 }
 
 // getters等々に補完が効かないのきつすぎる
@@ -47,6 +49,8 @@ export const initialState: State = {
   nextTrainId: 1,
   __chartRefresh: () => void 0,
   __saveId: 1,
+  inputtingPreviewDiagramDatas: [],
+  isShowPreview: true,
 };
 
 // const mockState: State = {

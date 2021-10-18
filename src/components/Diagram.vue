@@ -50,7 +50,7 @@
 
 <script lang="ts">
 import "chartjs-adapter-date-fns";
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted, ref, watch } from "vue";
 import { useStore } from "@/store";
 
 import { formatDdHhmmToHhmm } from "@/logics/diagram";
@@ -133,7 +133,9 @@ export default defineComponent({
     const trainTypes = computed(() => store.state.trainTypes);
 
     const data = computed(() => store.getters.getChatrJsData);
-
+    watch(data, () => {
+      store.state.__chartRefresh();
+    });
     const showingTrainId = computed(() => store.state.showingTrainId);
 
     const canAddTrainType = computed<boolean>(() => trainTypes.value.size < 6);

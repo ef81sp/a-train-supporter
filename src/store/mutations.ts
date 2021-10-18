@@ -205,4 +205,10 @@ export const mutations: MyMutation = {
   setSaveId(state, { id }) {
     state.__saveId = id;
   },
+  updateInputtingPreviewDiagramDatas(state, { data }) {
+    state.inputtingPreviewDiagramDatas = data;
+  },
+  updateIsShowPreview(state, { value }) {
+    state.isShowPreview = value;
+  },
 };

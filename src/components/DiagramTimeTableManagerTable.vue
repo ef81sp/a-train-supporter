@@ -124,7 +124,6 @@ export default defineComponent({
       resetCheckbox();
     };
     const rowClass = (data: DiagramData) => {
-      console.log(data);
       if (data.stationId === store.state.stationList.startingStationId) {
         return "bg-cyan-50";
       }

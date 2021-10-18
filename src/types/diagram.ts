@@ -4,13 +4,14 @@ export interface DiagramData {
   time: string;
   stationId: stationId;
   name?: string;
+  borderColor?: string;
 }
 
 export interface chartJsDataSet {
   id: number; // 列車IDが入る
   label: string; // 列車名が入る
   data: DiagramData[];
-  borderColor: string;
+  borderColor: string | Array<string>;
   borderWidth?: number;
 }
 
