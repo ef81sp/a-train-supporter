@@ -385,8 +385,6 @@ export default defineComponent({
 
       if (!trainType.value) return;
 
-      console.log(nextDepartureTime.value);
-
       store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
         data: [...selectedDiagramDataSetData.value, ...previewData.value],

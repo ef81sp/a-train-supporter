@@ -99,7 +99,6 @@ export const mutations: MyMutation = {
     state.trainTypes.set(id, data);
   },
   addTrain(state, { trainTypeId, trainId }) {
-    console.log(trainTypeId, trainId);
     const trainType = state.trainTypes.get(trainTypeId);
     if (!trainType) return;
 
