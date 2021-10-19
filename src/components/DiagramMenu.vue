@@ -18,8 +18,9 @@
     />
     <SplitButton
       label="ヘルプ"
-      icon="pi pi-question-circle"
+      icon="pi pi-external-link"
       class="mx-1"
+      @click="help"
       :model="[
         {
           label: '状態の初期化',
@@ -60,6 +61,13 @@ export default defineComponent({
     const handleInitialize = () => {
       store.dispatch("initialize");
     };
+    const help = () => {
+      window.open(
+        "https://pentagonal-potential-7b1.notion.site/DiaGen-280bbb46814c45f8b8ae7037b300d25f",
+        "",
+        "noreferrer"
+      );
+    };
 
     return {
       canUndo,
@@ -67,6 +75,7 @@ export default defineComponent({
       handleUndo,
       handleRedo,
       handleInitialize,
+      help,
     };
   },
 });
