@@ -110,7 +110,10 @@
         v-model:visible="isVisibleCopyModal"
         :diagramDataSet="selectedDiagramDataSet"
       />
-      <DiagramTimeTableManagerTable v-model="selectedDiagramDataSetData" />
+      <DiagramTimeTableManagerTable
+        v-model="selectedDiagramDataSetData"
+        id="diagram-time-table"
+      />
     </template>
   </Panel>
 </template>
@@ -407,18 +410,22 @@ export default defineComponent({
       store.commit("updateInputtingPreviewDiagramDatas", { data: newData });
     });
     // ロジック =======================================
-    const add = () => {
+    const add = async () => {
       if (!selectedDiagramDataSetData.value) return;
 
       if (!trainType.value) return;
 
-      store.dispatch("updateDiagramData", {
+      await store.dispatch("updateDiagramData", {
         id: showingTrainId.value,
         data: selectedDiagramDataSetData.value.length
           ? [...selectedDiagramDataSetData.value, ...previewData.value]
           : previewData.value,
       });
       props.refreshChart && props.refreshChart();
+      document
+        .getElementById("diagram-time-table")
+        ?.getElementsByTagName("table")[0]
+        ?.scrollIntoView(false);
     };
 
     const isVisibleCopyModal = ref(false);
