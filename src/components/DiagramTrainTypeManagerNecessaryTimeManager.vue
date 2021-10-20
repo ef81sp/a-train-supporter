@@ -170,8 +170,8 @@ export default defineComponent({
     };
 
     // 時計系
-    const selectedMultiplyer = ref(60);
-    const selectedFastForward = ref(10);
+    const selectedMultiplyer = ref(120);
+    const selectedFastForward = ref(1);
     const timer = ref(
       new Timer(selectedMultiplyer.value * selectedFastForward.value)
     );
