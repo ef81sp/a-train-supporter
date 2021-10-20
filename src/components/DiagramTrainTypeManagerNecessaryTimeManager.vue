@@ -89,7 +89,7 @@
               )
             "
             :disabled="nowStationInfo.finish"
-            class="col mx-1"
+            class="col mx-1 h-5rem"
           />
         </div>
         <div class="grid my-2">
