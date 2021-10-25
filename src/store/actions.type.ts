@@ -2,10 +2,12 @@ import { NecessaryTimeMap, Station, TrainType } from "@/types";
 import { DiagramData } from "@/types/diagram";
 import { ActionContext } from "vuex";
 import { State } from ".";
+import { MyGetters } from "./getters.type";
 import { MyCommit } from "./mutations.type";
 
 interface MyActionContext extends ActionContext<State, State> {
   commit: MyCommit;
+  getters: MyGetters;
 }
 
 interface ActionPayload {
@@ -17,6 +19,7 @@ interface ActionPayload {
   };
   updateDiagramData: { id: number; data: DiagramData[] };
   addTrain: { trainTypeId: number };
+  deleteTrain: { trainId: number };
   updateTrainType: { id: number; data: TrainType };
   deleteTrainType: { id: number };
   loadData: { id: number };

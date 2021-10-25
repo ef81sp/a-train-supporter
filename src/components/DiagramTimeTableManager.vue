@@ -2,6 +2,14 @@
   <Panel header="時刻" class="my-2">
     <template #icons> </template>
     <template v-if="selectedDiagramDataSet">
+      <div class="flex justify-content-end">
+        <Button
+          @click="deleteTrain"
+          icon="pi pi-ban"
+          label="編成削除"
+          class="p-button-sm p-button-warning"
+        />
+      </div>
       <p class="font-bold">
         <span :style="{ color: trainType?.lineColor }">■</span>
         {{ selectedDiagramDataSet.label }}
@@ -432,6 +440,10 @@ export default defineComponent({
     const copyFrom = () => {
       isVisibleCopyModal.value = true;
     };
+    const deleteTrain = () => {
+      if (!props.diagramDataSetId) return;
+      store.dispatch("deleteTrain", { trainId: props.diagramDataSetId });
+    };
 
     return {
       trainType,
@@ -447,6 +459,7 @@ export default defineComponent({
       selectedDiagramDataSet,
       selectedDiagramDataSetData,
       add,
+      deleteTrain,
       isVisibleCopyModal,
       copyFrom,
       previewData,
