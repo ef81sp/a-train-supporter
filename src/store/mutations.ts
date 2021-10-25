@@ -15,6 +15,7 @@ import { MyMutation } from "./mutations.type";
 const clone = rfdc();
 
 const mergeState = (state: State, newState: State) => {
+  const saveId = state.__saveId;
   const copyState = clone(newState);
   if (state.__history) {
     Object.assign(
@@ -24,7 +25,8 @@ const mergeState = (state: State, newState: State) => {
           stack: state.__history.stack.concat(copyState),
           nowIndex: state.__history.nowIndex,
         },
-      })
+      }),
+      { __saveId: saveId }
     );
   } else {
     Object.assign(
@@ -34,7 +36,8 @@ const mergeState = (state: State, newState: State) => {
           stack: [],
           nowIndex: 0,
         },
-      })
+      }),
+      { __saveId: saveId }
     );
   }
 };
