@@ -24,6 +24,14 @@ export const actions: MyActions = {
     context.state.__chartRefresh();
     context.commit("__logHistory");
   },
+  deleteTrainType(context, payload) {
+    context.commit("deleteTrainType", payload);
+    const nextShowingTrainId = context.state.diagramData.datasets[0]?.id;
+    if (nextShowingTrainId) {
+      context.commit("setShowingTrainId", { id: nextShowingTrainId });
+    }
+    context.commit("__logHistory");
+  },
   updateTrainTypeNecessaryTimeTable(context, payload) {
     context.commit("updateTrainTypeNecessaryTimeTable", payload);
     context.commit("__logHistory");

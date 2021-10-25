@@ -98,6 +98,13 @@ export const mutations: MyMutation = {
   updateTrainType(state, { id, data }) {
     state.trainTypes.set(id, data);
   },
+  deleteTrainType(state, { id }) {
+    const targetTrainType = state.trainTypes.get(id)
+    state.diagramData.datasets = state.diagramData.datasets.filter(
+      (v) => !targetTrainType?.trainIdList.includes(v.id)
+      );
+    state.trainTypes.delete(id);
+  },
   addTrain(state, { trainTypeId, trainId }) {
     const trainType = state.trainTypes.get(trainTypeId);
     if (!trainType) return;

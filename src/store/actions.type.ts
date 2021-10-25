@@ -18,6 +18,7 @@ interface ActionPayload {
   updateDiagramData: { id: number; data: DiagramData[] };
   addTrain: { trainTypeId: number };
   updateTrainType: { id: number; data: TrainType };
+  deleteTrainType: { id: number };
   loadData: { id: number };
 }
 
