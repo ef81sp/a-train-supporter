@@ -15,14 +15,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 // import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
-import MeasureNeccesaryTime from "@/components/MeasureNecessaryTime.vue";
 import Diagram from "@/components/Diagram.vue";
 
 export default defineComponent({
   name: "Home",
   components: {
     // HelloWorld,
-    MeasureNeccesaryTime,
     Diagram,
   },
 });
