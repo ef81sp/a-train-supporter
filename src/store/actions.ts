@@ -94,6 +94,5 @@ export const actions: MyActions = {
   },
   initialize(context) {
     context.commit("initialize");
-    context.commit("__logHistory");
   },
 };
