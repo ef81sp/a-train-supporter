@@ -98,6 +98,22 @@ export const mutations: MyMutation = {
   updateTrainType(state, { id, data }) {
     state.trainTypes.set(id, data);
   },
+  deleteTrainType(state, { id }) {
+    const targetTrainType = state.trainTypes.get(id);
+    state.diagramData.datasets = state.diagramData.datasets.filter(
+      (v) => !targetTrainType?.trainIdList.includes(v.id)
+    );
+    state.trainTypes.delete(id);
+  },
+  refreshTrainLabel(state, { trainTypeId }) {
+    const targetTrainType = state.trainTypes.get(trainTypeId);
+    if (!targetTrainType) return;
+    let i = 1;
+    state.diagramData.datasets.forEach((dataset) => {
+      if (!targetTrainType.trainIdList.includes(dataset.id)) return;
+      dataset.label = `${targetTrainType.name}-${i++}`;
+    });
+  },
   addTrain(state, { trainTypeId, trainId }) {
     const trainType = state.trainTypes.get(trainTypeId);
     if (!trainType) return;
@@ -119,6 +135,17 @@ export const mutations: MyMutation = {
     });
     state.showingTrainId = trainId;
   },
+  deleteTrain(state, { trainId }) {
+    state.diagramData.datasets = state.diagramData.datasets.filter(
+      (v) => v.id !== trainId
+    );
+    state.trainTypes.forEach((trainType) => {
+      trainType.trainIdList = trainType.trainIdList.filter(
+        (v) => v !== trainId
+      );
+    });
+  },
+
   incrementTrainId(state) {
     state.nextTrainId++;
   },

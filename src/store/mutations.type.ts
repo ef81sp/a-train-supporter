@@ -12,7 +12,10 @@ interface MutationPayload {
   updateDiagramData: { id: number; data: DiagramData[] };
   setShowingTrainId: { id: number };
   updateTrainType: { id: number; data: TrainType };
+  deleteTrainType: { id: number };
   addTrain: { trainTypeId: number; trainId: number };
+  deleteTrain: { trainId: number };
+  refreshTrainLabel: { trainTypeId: number };
   setChartRefresh: { chartRefresh: () => void };
   __updateLineColorAndTrainName: { trainTypeId: number };
   loadData: { id: number };

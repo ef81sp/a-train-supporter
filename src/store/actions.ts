@@ -10,6 +10,28 @@ export const actions: MyActions = {
     context.commit("incrementTrainId");
     context.commit("__logHistory");
   },
+  deleteTrain(context, payload) {
+    const trainType = context.getters.getTrainTypeByTrainId(payload.trainId);
+    if (!trainType) return;
+    const trainTypeIdList = trainType.trainIdList || [];
+    const nextShowingTrainId: number = (() => {
+      const index = trainTypeIdList.indexOf(payload.trainId);
+      const length = trainTypeIdList.length;
+      if (length >= 2) {
+        if (index === 0) {
+          return trainTypeIdList[index + 1];
+        } else {
+          return trainTypeIdList[index - 1];
+        }
+      } else {
+        return context.state.diagramData.datasets[0].id;
+      }
+    })();
+    context.commit("deleteTrain", payload);
+    context.commit("setShowingTrainId", { id: nextShowingTrainId });
+    context.commit("refreshTrainLabel", { trainTypeId: trainType.id });
+    context.commit("__logHistory");
+  },
   addInitialTrainType(context) {
     context.commit("addInitialTrainType");
     const newTrainTypeId = Math.max(...context.state.trainTypes.keys());
@@ -22,6 +44,14 @@ export const actions: MyActions = {
       trainTypeId: payload.id,
     });
     context.state.__chartRefresh();
+    context.commit("__logHistory");
+  },
+  deleteTrainType(context, payload) {
+    context.commit("deleteTrainType", payload);
+    const nextShowingTrainId = context.state.diagramData.datasets[0]?.id;
+    if (nextShowingTrainId) {
+      context.commit("setShowingTrainId", { id: nextShowingTrainId });
+    }
     context.commit("__logHistory");
   },
   updateTrainTypeNecessaryTimeTable(context, payload) {

@@ -182,12 +182,20 @@ export default defineComponent({
     const measureNecessaryTime = () => {
       isVisibleMeasureNecessaryTimeDialog.value = true;
     };
+    const deleteTrainType = () => {
+      store.dispatch("deleteTrainType", { id: props.trainTypeId });
+    };
     const splitButtonItems = ref([
       { label: "停車駅編集", icon: "pi pi-list", command: editStopStation },
       {
         label: "所要時間計測",
         icon: "pi pi-clock",
         command: measureNecessaryTime,
+      },
+      {
+        label: "種別削除",
+        icon: "pi pi-ban",
+        command: deleteTrainType,
       },
     ]);
     return {
