@@ -14,32 +14,43 @@ import { jsonParse, jsonStringify } from "@/common/util";
 import { MyMutation } from "./mutations.type";
 const clone = rfdc();
 
-const mergeState = (state: State, newState: State) => {
+const mergeState = (
+  state: State,
+  newState: State,
+  options: { resetHistory: boolean } = { resetHistory: false }
+) => {
   const saveId = state.__saveId;
   const copyState = clone(newState);
-  if (state.__history) {
+  const initialHistory = {
+    stack: [copyState],
+    nowIndex: 0,
+  };
+  if (!state.__history || options.resetHistory) {
     Object.assign(
       state,
       Object.assign(newState, {
-        __history: {
-          stack: state.__history.stack.concat(copyState),
-          nowIndex: state.__history.nowIndex,
-        },
-      }),
-      { __saveId: saveId }
+        __history: initialHistory,
+        __saveId: saveId,
+      })
     );
-  } else {
-    Object.assign(
-      state,
-      Object.assign(newState, {
-        __history: {
-          stack: [],
-          nowIndex: 0,
-        },
-      }),
-      { __saveId: saveId }
-    );
+    return;
   }
+
+  const stack = state.__history.stack.concat(copyState);
+  let index = stack.length - 1;
+  if (state.__history.nowIndex === 0 && state.__history.stack.length === 0) {
+    index = 0;
+  }
+  Object.assign(
+    state,
+    Object.assign(newState, {
+      __history: {
+        stack,
+        nowIndex: index,
+      },
+      __saveId: saveId,
+    })
+  );
 };
 
 export * from "./mutations.type";
@@ -224,7 +235,7 @@ export const mutations: MyMutation = {
       mergeState(state, newState);
     } else {
       const newState = jsonParse(rawData);
-      mergeState(state, newState);
+      mergeState(state, newState, { resetHistory: true });
     }
   },
   initialize(state) {
