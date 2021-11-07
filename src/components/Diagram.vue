@@ -11,12 +11,31 @@
     </div>
     <div class="col-12 md:col-8">
       <Panel header="ダイヤグラム" class="my-2">
-        <Chart
-          type="line"
-          :data="data"
-          :options="graphOptions"
-          ref="chartRef"
-        />
+        <template #icons>
+          <Button
+            icon="pi pi-search-minus"
+            class="p-button-sm p-button-secondary p-button-outlined mx-1"
+            @click="zoomOut"
+            :disabled="!canZoomOut"
+          />
+          <Button
+            icon="pi pi-search-plus"
+            class="p-button-sm p-button-secondary p-button-outlined mx-1"
+            @click="zoomIn"
+            :disabled="!canZoomIn"
+          />
+        </template>
+        <div class="overflow-x-auto">
+          <div :style="{ width: `${width}px`, height: '350px' }">
+            <Chart
+              type="line"
+              :data="data"
+              :options="graphOptions"
+              ref="chartRef"
+              :height="300"
+            />
+          </div>
+        </div>
       </Panel>
 
       <Panel header="種別と所要時間" class="my-1 time-table-manager-panel">
@@ -71,11 +90,26 @@ export default defineComponent({
   },
   setup() {
     const chartRef = ref<Chart>();
+
+    const width = ref(2000);
+    const canZoomIn = computed(() => width.value < 32000);
+    const canZoomOut = computed(() => width.value > 1000);
+    const zoomIn = () => {
+      if (canZoomIn.value) {
+        width.value *= 2;
+      }
+    };
+    const zoomOut = () => {
+      if (canZoomOut.value) {
+        width.value /= 2;
+      }
+    };
+
     const graphOptions = computed(() => ({
       tension: 0,
       animation: false,
       responsive: true,
-      aspectRatio: matchMedia("(max-width: 640px)").matches ? 2 : 3,
+      aspectRatio: width.value / 350,
       parsing: {
         xAxisKey: "time",
         yAxisKey: "name",
@@ -87,6 +121,7 @@ export default defineComponent({
           labels: {
             color: "#495057",
           },
+          position: "left",
         },
       },
       elements: {
@@ -152,6 +187,11 @@ export default defineComponent({
     return {
       data,
       graphOptions,
+      width,
+      canZoomIn,
+      canZoomOut,
+      zoomIn,
+      zoomOut,
       ltdExp,
       trainTypes,
       formatDdHhmmToHhmm,
