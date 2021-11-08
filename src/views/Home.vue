@@ -3,9 +3,7 @@
     <div
       class="flex flex-column justify-content-center align-items-center"
       v-if="false"
-    >
-      <MeasureNeccesaryTime class="card" />
-    </div>
+    ></div>
     <div class="card">
       <Diagram />
     </div>
