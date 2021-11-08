@@ -83,10 +83,13 @@ export const getters: MyGettersFunctions = {
       },
       { min: "", max: "" }
     );
-
-    result.min = dayjs(result.min, DATE_FORMAT)
-      .subtract(15, "minute")
-      .format(DATE_FORMAT);
+    // この計算はコンポーネントでやるべきな気がする
+    result.min = (() => {
+      const minTime = dayjs(result.min, DATE_FORMAT);
+      const minMinute =
+        ([50, 35, 20, 5, -10].find((v) => v <= minTime.get("minute")) || 5) - 5;
+      return minTime.set("minute", minMinute).format(DATE_FORMAT);
+    })();
     result.max = dayjs(result.max, DATE_FORMAT)
       .add(15, "minute")
       .format(DATE_FORMAT);
