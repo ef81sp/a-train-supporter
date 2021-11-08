@@ -77,10 +77,8 @@
           >
             次発
           </label>
-          <Calendar
+          <TimePicker
             id="next-nextDepartureTime"
-            :timeOnly="true"
-            hourFormat="24"
             v-model="nextDepartureTime"
             class="w-10"
           />
@@ -135,11 +133,13 @@ import { DATE_FORMAT } from "@/common/const";
 import { stationId } from "@/types";
 import DiagramTimeTableManagerTable from "@/components/DiagramTimeTableManagerTable.vue";
 import DiagramTimeTableManagerCopyFromOtherTrain from "@/components/DiagramTimeTableManagerCopyFromOtherTrain.vue";
+import TimePicker from "@/components/TimePicker.vue";
 import { DiagramData } from "@/types/diagram";
 export default defineComponent({
   components: {
     DiagramTimeTableManagerTable,
     DiagramTimeTableManagerCopyFromOtherTrain,
+    TimePicker,
   },
   props: {
     diagramDataSetId: { type: Number, default: undefined },

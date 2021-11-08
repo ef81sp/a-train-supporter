@@ -18,7 +18,7 @@
         {{ formatDdHhmmToHhmm(slotProps.data.time) }}
       </template>
       <template #editor="slotProps">
-        <DiagramTimeTableManagerTimeEditor v-model="slotProps.data['time']" />
+        <TimePicker v-model="slotProps.data['time']" :inline="true" />
       </template>
     </Column>
     <Column class="max-w-min">
@@ -40,7 +40,7 @@
   </DataTable>
 </template>
 <script lang="ts">
-import DiagramTimeTableManagerTimeEditor from "@/components/DiagramTimeTableManagerTimeEditor.vue";
+import TimePicker from "@/components/TimePicker.vue";
 import { DiagramData } from "@/types/diagram";
 import { computed, defineComponent, PropType, ref, watch } from "vue";
 import { useStore } from "@/store";
@@ -54,7 +54,7 @@ const clonedeep = rfdc();
 
 export default defineComponent({
   components: {
-    DiagramTimeTableManagerTimeEditor,
+    TimePicker,
   },
   props: {
     modelValue: { type: Object as PropType<DiagramData[]>, required: true },
